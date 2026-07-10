@@ -1,19 +1,12 @@
 # Stage 3 Changelog — `.constitution/tech-spec/`
 
-## v0.1.3 — 2026-07-10
-
-Docs: added a "Developer Environment" section to `guidelines.md` recording the devenv (Nix) shell adopted during Epic A — it supplies the pinned Rust 1.95.0 toolchain and GPUI's native build dependencies, while `rust-toolchain.toml` stays the source of truth for non-Nix contributors and CI. No stack or contract changes.
-
-## v0.1.2 — 2026-07-10
-
-Patch: licensing changed to MIT-only, tracking the operator's updated preference (`prd/` v0.1.1). Updated the License line in `stack.md` (now `MIT`) and the repository-layout license files in `guidelines.md` (`LICENSE-MIT` only). The `LICENSE-APACHE` file and per-crate Apache symlinks are removed during Epic A (GA-A002). No other stack entries changed.
-
 ## v0.1.1 — 2026-07-10
 
-Patch: substrate BOM correction discovered during Epic A (GA-A001) execution.
+Epic A execution updates (single tech-spec bump for the whole Epic A PR).
 
-- Removed the non-existent `gpui_platform = "=0.2.2"` from the substrate family in `stack.md`, `adrs/ADR-004-exact-pin-substrate.md`, and the Compatibility Policy. Live crates.io verification (2026-07-10) shows the crate returns 404 under every name/version and is absent from `gpui 0.2.2`'s dependency graph. GPUI selects its platform backend via **feature flags on `gpui`** (`wayland`/`x11` default-on for Linux, `metal` for macOS), so no sibling crate — and no version substitution — is required. The substrate family is now three crates: `gpui`, `gpui-component`, `gpui_http_client`.
-- No other pins changed; all remaining BOM entries re-confirmed resolvable on 2026-07-10.
+- **Substrate BOM correction (GA-A001):** removed the non-existent `gpui_platform = "=0.2.2"` from the substrate family in `stack.md`, `adrs/ADR-004-exact-pin-substrate.md`, and the Compatibility Policy. Live crates.io verification (2026-07-10) shows the crate returns 404 under every name/version and is absent from `gpui 0.2.2`'s dependency graph. GPUI selects its platform backend via **feature flags on `gpui`** (`wayland`/`x11` default-on for Linux, `metal` for macOS), so no sibling crate — and no version substitution — is required. The substrate family is now three crates: `gpui`, `gpui-component`, `gpui_http_client`. All other pins re-confirmed resolvable on 2026-07-10.
+- **Licensing → MIT only (GA-A002):** changed the License line in `stack.md` (now `MIT`) and the repository-layout license files in `guidelines.md` (`LICENSE-MIT` only) from `MIT OR Apache-2.0`, tracking the operator's updated preference (`prd/` v0.1.1). The `LICENSE-APACHE` file and per-crate Apache symlinks were removed.
+- **Developer environment (GA-A001):** added a "Developer Environment" section to `guidelines.md` recording the devenv (Nix) shell — pinned Rust 1.95.0 toolchain plus GPUI's native build dependencies — while `rust-toolchain.toml` stays the source of truth for non-Nix contributors and CI.
 
 ## v0.1.0 — 2026-07-09
 

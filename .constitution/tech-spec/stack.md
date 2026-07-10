@@ -2,7 +2,7 @@
 
 ## 0. Version
 
-**v0.1.2** — see [`changelog.md`](./changelog.md).
+**v0.1.1** — see [`changelog.md`](./changelog.md).
 
 All versions below verified against crates.io / upstream source on 2026-07-09; substrate family re-verified 2026-07-10 (see v0.1.1 correction).
 

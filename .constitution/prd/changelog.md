@@ -2,7 +2,7 @@
 
 ## v0.1.1 — 2026-07-10
 
-- Operator preference update: project licensing changed from `MIT OR Apache-2.0` to `MIT` only (`vision.md` Operator Preferences appendix). Propagated downstream to `tech-spec/` (v0.1.2) and applied during Epic A (GA-A002) execution: the `LICENSE-APACHE` file and per-crate Apache symlinks were removed, and every crate now declares `license = "MIT"`.
+- Operator preference update: project licensing changed from `MIT OR Apache-2.0` to `MIT` only (`vision.md` Operator Preferences appendix). Propagated downstream to `tech-spec/` (v0.1.1) and applied during Epic A (GA-A002) execution: the `LICENSE-APACHE` file and per-crate Apache symlinks were removed, and every crate now declares `license = "MIT"`.
 
 ## v0.1.0 — 2026-07-09
 
