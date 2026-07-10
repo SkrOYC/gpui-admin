@@ -1,0 +1,120 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gpui-admin.dev/schemas/workspace-layout.schema.json",
+  "title": "WorkspaceLayoutFile",
+  "description": "Local State Store (R9) persistence envelope for Workspace layouts. Generated from the persisted Rust types via schemars; this file is the committed contract (ADR-010). Contains NO Backend data and NO credentials by type construction.",
+  "type": "object",
+  "required": ["format_version", "workspaces"],
+  "additionalProperties": false,
+  "properties": {
+    "format_version": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "Envelope version. Unknown versions restore via the total-restoration rule (placeholder panels), never crash."
+    },
+    "active_workspace": {
+      "type": ["string", "null"],
+      "description": "Workspace id focused at last exit."
+    },
+    "workspaces": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/Workspace" }
+    }
+  },
+  "$defs": {
+    "Workspace": {
+      "type": "object",
+      "required": ["id", "root"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "type": "string", "description": "Stable Workspace identity (one OS window per Workspace)." },
+        "name": { "type": ["string", "null"] },
+        "window": { "$ref": "#/$defs/WindowGeometry" },
+        "root": { "$ref": "#/$defs/PanelNode" }
+      }
+    },
+    "WindowGeometry": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "x": { "type": "number" }, "y": { "type": "number" },
+        "width": { "type": "number" }, "height": { "type": "number" },
+        "display": { "type": ["string", "null"] }
+      }
+    },
+    "PanelNode": {
+      "description": "Panel tree: splits, tab groups, floating tiles, or a leaf panel.",
+      "oneOf": [
+        { "$ref": "#/$defs/SplitNode" },
+        { "$ref": "#/$defs/TabsNode" },
+        { "$ref": "#/$defs/TilesNode" },
+        { "$ref": "#/$defs/LeafPanel" }
+      ]
+    },
+    "SplitNode": {
+      "type": "object",
+      "required": ["kind", "axis", "children"],
+      "additionalProperties": false,
+      "properties": {
+        "kind": { "const": "split" },
+        "axis": { "enum": ["horizontal", "vertical"] },
+        "sizes": { "type": "array", "items": { "type": "number" } },
+        "children": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/PanelNode" } }
+      }
+    },
+    "TabsNode": {
+      "type": "object",
+      "required": ["kind", "children"],
+      "additionalProperties": false,
+      "properties": {
+        "kind": { "const": "tabs" },
+        "active_index": { "type": "integer", "minimum": 0 },
+        "children": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/LeafPanel" } }
+      }
+    },
+    "TilesNode": {
+      "type": "object",
+      "required": ["kind", "children"],
+      "additionalProperties": false,
+      "properties": {
+        "kind": { "const": "tiles" },
+        "children": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["panel", "bounds"],
+            "additionalProperties": false,
+            "properties": {
+              "panel": { "$ref": "#/$defs/LeafPanel" },
+              "bounds": {
+                "type": "object",
+                "required": ["x", "y", "width", "height"],
+                "properties": {
+                  "x": { "type": "number" }, "y": { "type": "number" },
+                  "width": { "type": "number" }, "height": { "type": "number" }
+                }
+              },
+              "z_index": { "type": "integer" }
+            }
+          }
+        }
+      }
+    },
+    "LeafPanel": {
+      "type": "object",
+      "required": ["kind", "panel_kind"],
+      "additionalProperties": false,
+      "properties": {
+        "kind": { "const": "panel" },
+        "panel_kind": {
+          "type": "string",
+          "description": "Registry-resolved kind string (Routing airlock entry 2), e.g. 'list:users', 'show:users', 'edit:users', 'diagnostics'. Unresolvable kinds restore as placeholder panels (RSK-08)."
+        },
+        "state": {
+          "description": "Panel-kind-owned payload (e.g. record id, query description). MUST NOT contain Record data.",
+          "type": ["object", "null"]
+        }
+      }
+    }
+  }
+}
