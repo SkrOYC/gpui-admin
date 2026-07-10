@@ -48,6 +48,10 @@ gpui-admin/
 
 **Dependency direction (enforced by crate graph):** `cli` and `conformance` never depend on `ui`; `core` depends on `gpui` but never on `gpui-component`; `provider-supabase` depends only on `core`'s public contracts (keeps the first-party Provider unprivileged, CAP-603/604); `macros` is a dependency of the Adopter's app crate, not of `core`.
 
+## Developer Environment
+
+A reproducible [devenv](https://devenv.sh) (Nix) shell provides the pinned Rust 1.95.0 toolchain and GPUI's native build dependencies — `wayland`, `libxkbcommon`, the xorg libs, `vulkan-loader`, `fontconfig`, and `freetype` on Linux; system frameworks on macOS. `rust-toolchain.toml` remains the source of truth for non-Nix contributors and CI, pinned to the same 1.95.0. Enter with `devenv shell`; the `ci` script runs the full local gate (fmt, clippy `-D warnings`, build, test). CI runners are not under devenv and install the equivalent system libraries via `apt` on the Linux lane.
+
 ## Coding Standards
 
 - **Formatting:** rustfmt defaults, checked in CI. No custom rustfmt.toml unless a rule earns an ADR.

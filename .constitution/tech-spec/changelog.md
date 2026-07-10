@@ -1,5 +1,9 @@
 # Stage 3 Changelog — `.constitution/tech-spec/`
 
+## v0.1.3 — 2026-07-10
+
+Docs: added a "Developer Environment" section to `guidelines.md` recording the devenv (Nix) shell adopted during Epic A — it supplies the pinned Rust 1.95.0 toolchain and GPUI's native build dependencies, while `rust-toolchain.toml` stays the source of truth for non-Nix contributors and CI. No stack or contract changes.
+
 ## v0.1.2 — 2026-07-10
 
 Patch: licensing changed to MIT-only, tracking the operator's updated preference (`prd/` v0.1.1). Updated the License line in `stack.md` (now `MIT`) and the repository-layout license files in `guidelines.md` (`LICENSE-MIT` only). The `LICENSE-APACHE` file and per-crate Apache symlinks are removed during Epic A (GA-A002). No other stack entries changed.
