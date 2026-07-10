@@ -1,0 +1,10 @@
+# devenv inputs. `languages.rust` is backed by rust-overlay, which must be
+# declared explicitly so a specific stable toolchain (1.95.0) can be resolved.
+inputs:
+  nixpkgs:
+    url: github:cachix/devenv-nixpkgs/rolling
+  rust-overlay:
+    url: github:oxalica/rust-overlay
+    inputs:
+      nixpkgs:
+        follows: nixpkgs
