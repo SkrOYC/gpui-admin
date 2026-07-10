@@ -47,7 +47,7 @@ Then gpui, gpui-component and gpui_http_client are exact-pinned ("=x.y.z")
 - **Dependencies:** GA-A001
 - **Category:** Docs
 - **Scope (In-Scope Files):**
-  - `LICENSE-MIT`, `LICENSE-APACHE`, `README.md`
+  - `LICENSE-MIT`, `README.md`
   - `crates/*/Cargo.toml` (license, authors, repository, description metadata)
 - **Scope (Out-of-Scope Files):**
   - `docs/` (Epic K, deferred)
@@ -55,20 +55,20 @@ Then gpui, gpui-component and gpui_http_client are exact-pinned ("=x.y.z")
 - **Expected Success Output:** `exit 0` (license files included in package listing)
 - **STOP Conditions:**
   - "STOP if any crate metadata would publish without both license files."
-- **Description:** Dual license `MIT OR Apache-2.0` with copyright line "Copyright (c) 2026 gpui-admin contributors". README states the product identity (Native-UX-led, per `prd/vision.md`), the pre-1.0 breaking-change policy (Compatibility Policy §3), and links the constitution. Every crate's metadata carries license, repo URL, and an honest description.
+- **Description:** MIT license (operator decision 2026-07-10; supersedes the earlier `MIT OR Apache-2.0`) with copyright line "Copyright (c) 2026 gpui-admin contributors". README states the product identity (Native-UX-led, per `prd/vision.md`), the pre-1.0 breaking-change policy (Compatibility Policy §3), and links the constitution. Every crate's metadata carries license, repo URL, and an honest description.
 - **Acceptance Criteria (Gherkin):**
 ```gherkin
 Given the repository root
 When license files are inspected
-Then both MIT and Apache-2.0 texts exist naming "gpui-admin contributors"
-And every crate manifest declares license = "MIT OR Apache-2.0"
+Then the MIT license text exists naming "gpui-admin contributors"
+And every crate manifest declares license = "MIT"
 ```
 
 ##### GA-A002 Deviations & Justifications
 
 - **Touched Files (outside the declared Scope):**
-  - `crates/*/LICENSE-MIT`, `crates/*/LICENSE-APACHE` (symlinks to the two root license files)
-- **Justification:** the ticket's verification command (`cargo package -p gpui-admin-core --list`) expects the license files to appear in each crate's package listing, and each crate is published standalone to crates.io (GA-A004), where a self-contained license file is expected. Per-crate symlinks to the single root license text keep licensing DRY while making every crate's package self-describing. `cargo package --list` follows the symlinks and includes them; the command exits 0 with no manifest warnings. The `license = "MIT OR Apache-2.0"` SPDX field is inherited from `[workspace.package]` (defined in GA-A001) via `license.workspace = true`.
+  - `crates/*/LICENSE-MIT` (symlinks to the root LICENSE-MIT file)
+- **Justification:** the ticket's verification command (`cargo package -p gpui-admin-core --list`) expects the license files to appear in each crate's package listing, and each crate is published standalone to crates.io (GA-A004), where a self-contained license file is expected. Per-crate symlinks to the single root license text (`LICENSE-MIT`) keep licensing DRY while making every crate's package self-describing. `cargo package --list` follows the symlinks and includes them; the command exits 0 with no manifest warnings. The `license = "MIT"` SPDX field is inherited from `[workspace.package]` (defined in GA-A001) via `license.workspace = true`. (Licensing was changed to MIT-only on 2026-07-10 per operator decision; the earlier `LICENSE-APACHE` and its per-crate symlinks were removed.)
 
 #### GA-A003 Continuous integration pipeline
 

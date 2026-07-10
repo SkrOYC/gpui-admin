@@ -10,7 +10,7 @@ gpui-admin/
 │                                   # [workspace.lints], shared metadata
 ├── Cargo.lock                      # committed
 ├── rust-toolchain.toml             # 1.95.0 + rustfmt/clippy/rust-analyzer
-├── LICENSE-MIT / LICENSE-APACHE
+├── LICENSE-MIT
 ├── README.md                       # identity, quickstart, pre-1.0 churn policy
 ├── crates/
 │   ├── gpui-admin/                 # facade: prelude re-exports of core+ui+macros;

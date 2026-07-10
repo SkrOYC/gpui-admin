@@ -2,7 +2,7 @@
 
 ## 0. Version
 
-**v0.1.1** — see [`changelog.md`](./changelog.md).
+**v0.1.2** — see [`changelog.md`](./changelog.md).
 
 All versions below verified against crates.io / upstream source on 2026-07-09; substrate family re-verified 2026-07-10 (see v0.1.1 correction).
 
@@ -58,7 +58,7 @@ All versions below verified against crates.io / upstream source on 2026-07-09; s
 - **CI:** GitHub Actions — `ubuntu-latest` + `macos-latest` (NFC-40: P0 platforms only; Windows lane added at P1). Jobs: fmt-check, clippy `-D warnings`, tests, showcase build. Conformance suite runs against the compose backend on the Linux lane.
 - **Showcase backend:** repo-contained `docker compose` — PostgreSQL 17 + PostgREST 13 with seeded schema (`data-models/showcase-backend.sql`) (ADR-008). Reproducible on any contributor machine; a hosted demo instance is a later, separate concern.
 - **Release:** `release-plz` for versioning/publishing the crate family; `Cargo.lock` committed at workspace root.
-- **License:** `MIT OR Apache-2.0` (Rust convention; substrate is Apache-2.0-compatible).
+- **License:** `MIT` (operator decision, 2026-07-10; supersedes the earlier `MIT OR Apache-2.0`). MIT is compatible with the Apache-2.0-licensed substrate.
 
 ## Compatibility Policy (binding)
 

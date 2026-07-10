@@ -68,13 +68,9 @@ This project is governed by a four-stage constitution under
 
 ## License
 
-Dual-licensed under either of
-
-- Apache License, Version 2.0 ([LICENSE-APACHE](LICENSE-APACHE))
-- MIT license ([LICENSE-MIT](LICENSE-MIT))
-
-at your option. Copyright (c) 2026 gpui-admin contributors.
+Licensed under the [MIT license](LICENSE-MIT). Copyright (c) 2026 gpui-admin
+contributors.
 
 Unless you explicitly state otherwise, any contribution intentionally submitted for
-inclusion in the work by you, as defined in the Apache-2.0 license, shall be
-dual-licensed as above, without any additional terms or conditions.
+inclusion in the work by you shall be licensed as above, without any additional terms
+or conditions.

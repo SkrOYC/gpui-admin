@@ -1,5 +1,9 @@
 # Stage 3 Changelog — `.constitution/tech-spec/`
 
+## v0.1.2 — 2026-07-10
+
+Patch: licensing changed to MIT-only, tracking the operator's updated preference (`prd/` v0.1.1). Updated the License line in `stack.md` (now `MIT`) and the repository-layout license files in `guidelines.md` (`LICENSE-MIT` only). The `LICENSE-APACHE` file and per-crate Apache symlinks are removed during Epic A (GA-A002). No other stack entries changed.
+
 ## v0.1.1 — 2026-07-10
 
 Patch: substrate BOM correction discovered during Epic A (GA-A001) execution.
