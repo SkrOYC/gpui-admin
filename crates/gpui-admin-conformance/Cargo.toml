@@ -3,6 +3,10 @@ name = "gpui-admin-conformance"
 version.workspace = true
 edition.workspace = true
 rust-version.workspace = true
+description = "Executable conformance suite for the gpui-admin Provider contract."
+license.workspace = true
+repository.workspace = true
+authors.workspace = true
 
 [dependencies]
 gpui-admin-core.workspace = true

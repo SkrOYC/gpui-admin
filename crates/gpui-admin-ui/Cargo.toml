@@ -3,6 +3,10 @@ name = "gpui-admin-ui"
 version.workspace = true
 edition.workspace = true
 rust-version.workspace = true
+description = "Shell, views, forms, and layout store for gpui-admin, built on gpui-component."
+license.workspace = true
+repository.workspace = true
+authors.workspace = true
 
 [dependencies]
 gpui.workspace = true

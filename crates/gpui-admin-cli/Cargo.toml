@@ -3,6 +3,10 @@ name = "gpui-admin-cli"
 version.workspace = true
 edition.workspace = true
 rust-version.workspace = true
+description = "The gpui-admin command-line tool: schema introspection, snapshotting, and scaffolding."
+license.workspace = true
+repository.workspace = true
+authors.workspace = true
 
 [[bin]]
 name = "gpui-admin"

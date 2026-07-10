@@ -3,6 +3,10 @@ name = "gpui-admin-macros"
 version.workspace = true
 edition.workspace = true
 rust-version.workspace = true
+description = "Derivation proc-macros for gpui-admin, consuming the committed schema snapshot."
+license.workspace = true
+repository.workspace = true
+authors.workspace = true
 
 [lib]
 proc-macro = true
