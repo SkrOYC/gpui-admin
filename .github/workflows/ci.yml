@@ -7,7 +7,15 @@ on:
 
 concurrency:
   group: ci-${{ github.ref }}
-  cancel-in-progress: true
+  # Cancel superseded runs on PR branches, but never on master: GA-A005 makes
+  # CI a required status check, so a master run must always complete rather than
+  # be cancelled by a back-to-back merge.
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+# Read-only workflow (checkout + build/test; no writes, no publishing).
+# Pin least-privilege token scopes explicitly.
+permissions:
+  contents: read
 
 env:
   CARGO_TERM_COLOR: always
@@ -56,11 +64,14 @@ jobs:
 
       - uses: Swatinem/rust-cache@v2
 
+      # --locked fails the run if Cargo.lock is stale, so the committed lockfile
+      # (Compatibility Policy §2, ADR-004 hermetic builds) is actually exercised
+      # rather than silently regenerated from the commodity caret ranges.
       - name: clippy (deny warnings)
-        run: cargo clippy --workspace --all-targets -- -D warnings
+        run: cargo clippy --workspace --all-targets --locked -- -D warnings
 
       - name: build
-        run: cargo build --workspace
+        run: cargo build --workspace --locked
 
       - name: test
-        run: cargo test --workspace
+        run: cargo test --workspace --locked

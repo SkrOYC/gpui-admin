@@ -2,7 +2,7 @@
 
 ## 0. Version
 
-**v0.1.0** — see [`changelog.md`](./changelog.md).
+**v0.1.1** — see [`changelog.md`](./changelog.md).
 
 ## Executive Summary
 
