@@ -57,7 +57,7 @@ Two bounded contexts (Build-Time, Run-Time) plus one shared contract boundary. E
 ### R1 — Provider Gateway
 
 - **Logical Type:** Port/boundary (hexagonal edge).
-- **Responsibility:** Sole communication path to the Backend. Translates typed requests into Backend-specific transport; surfaces declared Capabilities to the rest of the client; normalizes every failure into the structured error taxonomy (unauthenticated / forbidden / not-found / field-validation / conflict / transport); hosts the optional change-feed channel including reconnect detection.
+- **Responsibility:** Sole communication path to the Backend. Translates typed requests into Backend-specific transport; surfaces declared Capabilities to the rest of the client; normalizes every failure into the structured error taxonomy (unauthenticated / forbidden / not-found / unsupported-query / field-validation / conflict / transport); hosts the optional change-feed channel including reconnect detection.
 - **Inputs:** Typed read/window/mutation requests (in-process, async request-response); change-feed events (async event stream, when the Capability exists).
 - **Outputs:** Typed results and normalized errors to R2/R3; connectivity state to R5/R8; feed events to R2.
 - **Depends on:** External Backend; C1 contract.
@@ -65,7 +65,7 @@ Two bounded contexts (Build-Time, Run-Time) plus one shared contract boundary. E
 ### R2 — Resource Replica
 
 - **Logical Type:** In-memory state authority (one logical instance per Resource, statically specialized).
-- **Responsibility:** Authoritative client-side truth for one Resource: normalized record store with per-record fault containment (CAP-205); query entries holding window state, memoized joined views, freshness age, and a generation counter that discards stale responses; the pending-change overlay applied at read time; field-aware invalidation (membership/order changes → refetch; display-only changes → in-place patch); last-write-wins reconciliation of feed events; staleness-driven refetch and eviction of unobserved queries. Exposes an observation surface so Views react to change, and an introspection surface for R8.
+- **Responsibility:** Authoritative client-side truth for one Resource: normalized record store with per-record fault containment (CAP-205); query entries holding window state, memoized joined views, freshness age, and a generation counter that discards stale responses; the pending-change overlay applied at read time; field-aware invalidation (membership/order changes → refetch; display-only changes → in-place patch); last-write-wins reconciliation of feed events; staleness-driven refetch and eviction of unobserved queries. Exposes an observation surface so Views react to change, and an introspection surface for R8. Observed-status is tracked by framework-owned observation guards (registered on mount, released on drop) — deliberately independent of any substrate observer mechanism, which offers no count introspection.
 - **Inputs:** Fetched results and feed events (from R1), overlay commands (from R3), window demands and observation registrations (from R6 via R4).
 - **Outputs:** Read-time query views; change notifications (in-process observation pattern).
 - **Depends on:** R1. **Depth standard:** smallest interface (read view, request window, observe) hiding the system's deepest complexity.

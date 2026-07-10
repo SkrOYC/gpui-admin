@@ -164,7 +164,7 @@ And a chosen option with downstream ticket impact listed
 - **Verification Command:** `cargo test -p gpui-admin-core registry::assert`
 - **Expected Success Output:** `exit 0`
 - **STOP Conditions:**
-  - "STOP if any assertion failure can surface later than startup; fail-fast is the contract (CAP-402, §0.3)."
+  - "STOP if any assertion failure can surface later than startup; fail-fast is the contract (CAP-402; `.constitution/architecture/containers.md`, R4 startup completeness assertions)."
 - **Description:** The startup completeness sweep over derived registrations: every declared relation target registered, every panel kind string claimed exactly once, duplicate resource keys rejected — each failure a clear, named panic at launch, never a mid-session surprise.
 - **Acceptance Criteria (Gherkin):**
 ```gherkin

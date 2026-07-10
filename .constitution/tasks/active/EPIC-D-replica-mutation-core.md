@@ -121,7 +121,7 @@ Then the entry is marked stale and refetches
 - **Verification Command:** `cargo test -p gpui-admin-core replica::freshness`
 - **Expected Success Output:** `exit 0`
 - **STOP Conditions:**
-  - "STOP if observation counting requires substrate observer introspection; guards are manual bookkeeping by design (§7.1 correction)."
+  - "STOP if observation counting requires substrate observer introspection; guards are framework-owned bookkeeping by design (see `.constitution/architecture/containers.md`, R2 observation-guard note)."
 - **Description:** The 2×2 policy: fresh→serve; stale+observed→serve-then-background-refetch; stale+unobserved→evict on the low-frequency sweep. Observation via RAII guard objects (Drop decrements). Wall-clock `fetched_at` with revalidation on activation (suspend-safety).
 - **Acceptance Criteria (Gherkin):**
 ```gherkin

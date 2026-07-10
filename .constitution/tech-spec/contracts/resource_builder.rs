@@ -11,7 +11,7 @@
 
 use crate::provider::{FieldIdent, Resource};
 
-/// Entry point. `S` is the Snapshot-generated schema type for the Resource.
+/// Entry point. `R` is the Snapshot-generated Resource type.
 pub fn resource<R: Resource>() -> ResourceBuilder<R> { unimplemented!() }
 
 pub struct ResourceBuilder<R: Resource> { /* opaque */ _marker: std::marker::PhantomData<R> }

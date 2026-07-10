@@ -8,7 +8,7 @@
 
 ## Failure Handling
 
-**Error taxonomy (normalized at R1, consumed everywhere):** unauthenticated · forbidden · not-found · field-validation (carries per-Field detail) · conflict · transport (retryable flag) · provider-internal. Views never see raw transport failures.
+**Error taxonomy (normalized at R1, consumed everywhere):** unauthenticated · forbidden · not-found · unsupported-query (a Filter/Search construct this Provider cannot translate — rejected loudly, never dropped) · field-validation (carries per-Field detail) · conflict · transport (retryable flag) · provider-internal. Views never see raw transport failures.
 
 **Reads (windows, records, refetches):**
 - Per-request timeout; bounded automatic retries with backoff for retryable transport errors — reads are idempotent by contract.

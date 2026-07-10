@@ -51,7 +51,7 @@ pub mod user {
     /// FK relations captured from constraints (postgres) or reference
     /// annotations (openapi). Targets are TYPE references — boot-asserted.
     pub const RELATIONS: &[RelationMeta] = &[
-        RelationMeta { via: UserField::OrgId, target_key: "organization" },
+        RelationMeta { via: UserField::OrgId, target_key: "organizations" },
     ];
 
     pub struct FieldMeta {
