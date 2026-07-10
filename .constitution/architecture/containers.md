@@ -57,7 +57,7 @@ Two bounded contexts (Build-Time, Run-Time) plus one shared contract boundary. E
 ### R1 — Provider Gateway
 
 - **Logical Type:** Port/boundary (hexagonal edge).
-- **Responsibility:** Sole communication path to the Backend. Translates typed requests into Backend-specific transport; surfaces declared Capabilities to the rest of the client; normalizes every failure into the structured error taxonomy (unauthenticated / forbidden / not-found / unsupported-query / field-validation / conflict / transport); hosts the optional change-feed channel including reconnect detection.
+- **Responsibility:** Sole communication path to the Backend. Translates typed requests into Backend-specific transport; surfaces declared Capabilities to the rest of the client; normalizes every failure into the structured error taxonomy (unauthenticated / forbidden / not-found / unsupported-query / field-validation / conflict / transport / provider-internal); hosts the optional change-feed channel including reconnect detection.
 - **Inputs:** Typed read/window/mutation requests (in-process, async request-response); change-feed events (async event stream, when the Capability exists).
 - **Outputs:** Typed results and normalized errors to R2/R3; connectivity state to R5/R8; feed events to R2.
 - **Depends on:** External Backend; C1 contract.
