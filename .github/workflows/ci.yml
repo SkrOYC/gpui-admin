@@ -47,7 +47,7 @@ jobs:
             libwayland-dev libxkbcommon-dev libxkbcommon-x11-dev \
             libx11-dev libxcursor-dev libxi-dev libxrandr-dev libxext-dev libxcb1-dev \
             libvulkan-dev \
-            libfontconfig-1-dev libfreetype-dev
+            libfontconfig1-dev libfreetype-dev
 
       - uses: dtolnay/rust-toolchain@stable
         with:
