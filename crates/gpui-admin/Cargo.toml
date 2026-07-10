@@ -1,0 +1,17 @@
+[package]
+name = "gpui-admin"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+description = "Native-UX-led desktop admin framework for Rust, built on GPUI (facade/prelude crate)."
+license.workspace = true
+repository.workspace = true
+authors.workspace = true
+
+[dependencies]
+gpui-admin-core.workspace = true
+gpui-admin-ui.workspace = true
+gpui-admin-macros.workspace = true
+
+[lints]
+workspace = true

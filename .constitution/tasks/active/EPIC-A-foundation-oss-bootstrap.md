@@ -27,8 +27,18 @@ And the lockfile is committed and matches the pinned BOM
 
 Given the substrate family entries in Cargo.toml
 When dependency versions are inspected
-Then gpui, gpui_platform, gpui-component and gpui_http_client are exact-pinned ("=x.y.z")
+Then gpui, gpui-component and gpui_http_client are exact-pinned ("=x.y.z")
 ```
+
+##### GA-A001 Deviations & Justifications
+
+- **Touched Files (outside the declared Scope):**
+  - `devenv.nix`, `devenv.yaml`, `devenv.lock`, `.envrc` (committed in a preceding foundation commit)
+  - `.constitution/tech-spec/stack.md`, `.constitution/tech-spec/adrs/ADR-004-exact-pin-substrate.md`, `.constitution/tech-spec/changelog.md`
+  - `.constitution/tasks/active/EPIC-A-foundation-oss-bootstrap.md` (this file — the Gherkin line above)
+- **Justification:**
+  - **devenv (operator request + build necessity):** the operator asked to use devenv for tooling, and this ticket's Gherkin ("all seven crates compile") requires a real compile of the GPUI substrate, which needs a reproducible native graphics/windowing/font stack (wayland, xkbcommon, xorg, vulkan-loader, fontconfig, freetype). The in-scope `rust-toolchain.toml` still pins Rust 1.95.0 for non-Nix contributors and CI; devenv provides that same toolchain plus the system libraries.
+  - **Spec correction (Step 4 — Keep the Spec Folders Honest):** `stack.md` and ADR-004 listed a non-existent substrate crate `gpui_platform = "=0.2.2"`. Live crates.io verification on 2026-07-10 shows it returns 404 under every name/version and is absent from `gpui 0.2.2`'s dependency graph; GPUI selects its platform backend through `gpui` feature flags (`wayland`/`x11` default-on for Linux, `metal` for macOS). It was removed with **no version substituted** (honoring the STOP condition) and the tech-spec bumped to v0.1.1. The matching line in this ticket's own Gherkin was corrected to name the three real substrate crates.
 
 #### GA-A002 Licenses, README, and repository metadata
 
@@ -37,7 +47,7 @@ Then gpui, gpui_platform, gpui-component and gpui_http_client are exact-pinned (
 - **Dependencies:** GA-A001
 - **Category:** Docs
 - **Scope (In-Scope Files):**
-  - `LICENSE-MIT`, `LICENSE-APACHE`, `README.md`
+  - `LICENSE-MIT`, `README.md`
   - `crates/*/Cargo.toml` (license, authors, repository, description metadata)
 - **Scope (Out-of-Scope Files):**
   - `docs/` (Epic K, deferred)
@@ -45,14 +55,21 @@ Then gpui, gpui_platform, gpui-component and gpui_http_client are exact-pinned (
 - **Expected Success Output:** `exit 0` (license files included in package listing)
 - **STOP Conditions:**
   - "STOP if any crate metadata would publish without both license files."
-- **Description:** Dual license `MIT OR Apache-2.0` with copyright line "Copyright (c) 2026 gpui-admin contributors". README states the product identity (Native-UX-led, per `prd/vision.md`), the pre-1.0 breaking-change policy (Compatibility Policy §3), and links the constitution. Every crate's metadata carries license, repo URL, and an honest description.
+- **Description:** MIT license (operator decision 2026-07-10; supersedes the earlier `MIT OR Apache-2.0`) with copyright line "Copyright (c) 2026 gpui-admin contributors". README states the product identity (Native-UX-led, per `prd/vision.md`), the pre-1.0 breaking-change policy (Compatibility Policy §3), and links the constitution. Every crate's metadata carries license, repo URL, and an honest description.
 - **Acceptance Criteria (Gherkin):**
 ```gherkin
 Given the repository root
 When license files are inspected
-Then both MIT and Apache-2.0 texts exist naming "gpui-admin contributors"
-And every crate manifest declares license = "MIT OR Apache-2.0"
+Then the MIT license text exists naming "gpui-admin contributors"
+And every crate manifest declares license = "MIT"
 ```
+
+##### GA-A002 Deviations & Justifications
+
+- **Touched Files (outside the declared Scope):**
+  - `crates/*/LICENSE-MIT` (symlinks to the root LICENSE-MIT file)
+  - MIT-decision propagation across the constitution: `.constitution/prd/vision.md`, `.constitution/prd/changelog.md`, `.constitution/tech-spec/stack.md` (License line), `.constitution/tech-spec/guidelines.md` (repository layout), `.constitution/tech-spec/changelog.md`, `.constitution/tasks/changelog.md`
+- **Justification:** the ticket's verification command (`cargo package -p gpui-admin-core --list`) expects the license files to appear in each crate's package listing, and each crate is published standalone to crates.io (GA-A004), where a self-contained license file is expected. Per-crate symlinks to the single root license text (`LICENSE-MIT`) keep licensing DRY while making every crate's package self-describing. `cargo package --list` follows the symlinks and includes them; the command exits 0 with no manifest warnings. The `license = "MIT"` SPDX field is inherited from `[workspace.package]` (defined in GA-A001) via `license.workspace = true`. (Licensing was changed to MIT-only on 2026-07-10 per operator decision; the earlier `LICENSE-APACHE` and its per-crate symlinks were removed.)
 
 #### GA-A003 Continuous integration pipeline
 

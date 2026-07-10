@@ -1,0 +1,77 @@
+name: CI
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  # Cancel superseded runs on PR branches, but never on master: GA-A005 makes
+  # CI a required status check, so a master run must always complete rather than
+  # be cancelled by a back-to-back merge.
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+# Read-only workflow (checkout + build/test; no writes, no publishing).
+# Pin least-privilege token scopes explicitly.
+permissions:
+  contents: read
+
+env:
+  CARGO_TERM_COLOR: always
+  RUSTFLAGS: "-D warnings"
+
+jobs:
+  fmt:
+    name: fmt-check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: "1.95.0"
+          components: rustfmt
+      - run: cargo fmt --all -- --check
+
+  build-test-clippy:
+    name: ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+    steps:
+      - uses: actions/checkout@v4
+
+      # GPUI's native graphics/windowing/font stack. The CI runners are not
+      # under devenv, so the Linux job installs the same libraries devenv
+      # provides locally. macOS uses system frameworks (Metal / CoreText).
+      - name: Install GPUI system libraries (Linux)
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            pkg-config cmake \
+            libwayland-dev libxkbcommon-dev libxkbcommon-x11-dev \
+            libx11-dev libxcursor-dev libxi-dev libxrandr-dev libxext-dev libxcb1-dev \
+            libvulkan-dev \
+            libfontconfig1-dev libfreetype-dev
+
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: "1.95.0"
+          components: clippy
+
+      - uses: Swatinem/rust-cache@v2
+
+      # --locked fails the run if Cargo.lock is stale, so the committed lockfile
+      # (Compatibility Policy §2, ADR-004 hermetic builds) is actually exercised
+      # rather than silently regenerated from the commodity caret ranges.
+      - name: clippy (deny warnings)
+        run: cargo clippy --workspace --all-targets --locked -- -D warnings
+
+      - name: build
+        run: cargo build --workspace --locked
+
+      - name: test
+        run: cargo test --workspace --locked

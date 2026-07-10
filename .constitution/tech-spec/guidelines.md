@@ -10,7 +10,7 @@ gpui-admin/
 │                                   # [workspace.lints], shared metadata
 ├── Cargo.lock                      # committed
 ├── rust-toolchain.toml             # 1.95.0 + rustfmt/clippy/rust-analyzer
-├── LICENSE-MIT / LICENSE-APACHE
+├── LICENSE-MIT
 ├── README.md                       # identity, quickstart, pre-1.0 churn policy
 ├── crates/
 │   ├── gpui-admin/                 # facade: prelude re-exports of core+ui+macros;
@@ -46,7 +46,11 @@ gpui-admin/
 └── .github/workflows/              # ci.yml (fmt, clippy, test, conformance), release-plz.yml
 ```
 
-**Dependency direction (enforced by crate graph):** `cli` and `conformance` never depend on `ui`; `core` depends on `gpui` but never on `gpui-component`; `provider-supabase` depends only on `core`'s public contracts (keeps the first-party Provider unprivileged, CAP-603/604); `macros` is a dependency of the Adopter's app crate, not of `core`.
+**Dependency direction (enforced by crate graph):** `cli` and `conformance` never depend on `ui`; `core` depends on `gpui` but never on `gpui-component`; `provider-supabase` (and the `conformance` harness) depend on `core`'s public contracts plus `gpui_http_client` solely to name the injected `HttpClient` trait they must implement/exercise (ADR-003, `contracts/provider.rs`) — no other substrate privilege, keeping the first-party Provider unprivileged (CAP-603/604); `macros` is a dependency of the Adopter's app crate, not of `core`.
+
+## Developer Environment
+
+A reproducible [devenv](https://devenv.sh) (Nix) shell provides the pinned Rust 1.95.0 toolchain and GPUI's native build dependencies — `wayland`, `libxkbcommon`, the xorg libs, `vulkan-loader`, `fontconfig`, and `freetype` on Linux; system frameworks on macOS. `rust-toolchain.toml` is the source of truth for non-Nix contributors — their local `rustup` selects `1.95.0` automatically; CI pins the same `1.95.0` explicitly in `ci.yml`, kept in lockstep with this file and `devenv.nix`. Enter with `devenv shell`; the `ci` script runs the full local gate (fmt, clippy `-D warnings`, build, test). CI runners are not under devenv and install the equivalent system libraries via `apt` on the Linux lane.
 
 ## Coding Standards
 

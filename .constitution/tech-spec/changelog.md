@@ -1,5 +1,13 @@
 # Stage 3 Changelog — `.constitution/tech-spec/`
 
+## v0.1.1 — 2026-07-10
+
+Epic A execution updates (single tech-spec bump for the whole Epic A PR).
+
+- **Substrate BOM correction (GA-A001):** removed the non-existent `gpui_platform = "=0.2.2"` from the substrate family in `stack.md`, `adrs/ADR-004-exact-pin-substrate.md`, and the Compatibility Policy. Live crates.io verification (2026-07-10) shows the crate returns 404 under every name/version and is absent from `gpui 0.2.2`'s dependency graph. GPUI selects its platform backend via **feature flags on `gpui`** (`wayland`/`x11` default-on for Linux, `metal` for macOS), so no sibling crate — and no version substitution — is required. The substrate family is now three crates: `gpui`, `gpui-component`, `gpui_http_client`. All other pins re-confirmed resolvable on 2026-07-10.
+- **Licensing → MIT only (GA-A002):** changed the License line in `stack.md` (now `MIT`) and the repository-layout license files in `guidelines.md` (`LICENSE-MIT` only) from `MIT OR Apache-2.0`, tracking the operator's updated preference (`prd/` v0.1.1). The `LICENSE-APACHE` file and per-crate Apache symlinks were removed.
+- **Developer environment + dependency-direction wording (GA-A001, refined during PR review):** added a "Developer Environment" section to `guidelines.md` recording the devenv (Nix) shell — pinned Rust 1.95.0 toolchain plus GPUI's native build dependencies. Clarified that `rust-toolchain.toml` is the source of truth for non-Nix contributors while CI mirrors the `1.95.0` pin explicitly (kept in lockstep, not auto-read), correcting the earlier "source of truth for CI" phrasing. Also noted in the dependency-direction rule that `provider-supabase`/`conformance` legitimately depend on `gpui_http_client` solely to name the injected `HttpClient` trait (ADR-003), which is not a boundary breach.
+
 ## v0.1.0 — 2026-07-09
 
 Initial implementation constitution, derived from `.constitution/prd/` v0.1.0 and `.constitution/architecture/` v0.1.0. All version pins verified against crates.io/upstream source on this date.

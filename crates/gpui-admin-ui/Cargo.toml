@@ -1,0 +1,22 @@
+[package]
+name = "gpui-admin-ui"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+description = "Shell, views, forms, and layout store for gpui-admin, built on gpui-component."
+license.workspace = true
+repository.workspace = true
+authors.workspace = true
+
+[dependencies]
+gpui.workspace = true
+gpui-component.workspace = true
+gpui-admin-core.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+schemars.workspace = true
+dirs.workspace = true
+tracing.workspace = true
+
+[lints]
+workspace = true

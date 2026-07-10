@@ -1,5 +1,13 @@
 # Stage 4 Changelog — `.constitution/tasks/`
 
+## v0.1.1 — 2026-07-10
+
+Epic A execution progress (the epic remains **active** — see the still-open remote tail below).
+
+- **Ticket-document corrections (Step 4, keep-specs-honest):** in `active/EPIC-A-foundation-oss-bootstrap.md`, corrected GA-A001's Gherkin to name the three real substrate crates (`gpui`, `gpui-component`, `gpui_http_client`) after the non-existent `gpui_platform` was removed upstream (tech-spec v0.1.1), and updated GA-A002's description/verification to MIT-only (operator decision, prd v0.1.1). Appended `Deviations & Justifications` blocks to GA-A001 (devenv committed as a build necessity + the substrate spec correction) and GA-A002 (per-crate `LICENSE-MIT` symlinks for self-contained crate packaging).
+- **Local + registry deliverables landed:** GA-A001 (7-crate workspace, exact-pinned substrate, `Cargo.lock` committed, clean clippy `-D warnings`), GA-A002 (MIT license + README + per-crate metadata), and GA-A004 (all seven family names published to crates.io as `0.0.1` placeholders, each README linking the repository) are complete and independently reviewed. GA-A003's `.github/workflows/ci.yml` is committed and `actionlint`-clean.
+- **Still open (deferred to the push/PR session by operator instruction):** GA-A003's acceptance is remote — `gh run watch` green on `ubuntu-latest` + `macos-latest` — and requires the branch to be pushed; GA-A005 (repo public + `master` branch protection) requires the push plus repo-admin access. Because those two tickets are not yet satisfiable, the epic is **not** archived and `critical-path.md` story points are **unchanged** (121 pts / 6 epics). Formal close (archive + critical-path recompute) happens once CI is verified green and protection is enabled.
+
 ## v0.1.0 — 2026-07-09
 
 Initial execution constitution, derived from `.constitution/tech-spec/` v0.1.0 (with `architecture/` and `prd/` v0.1.0 upstream).

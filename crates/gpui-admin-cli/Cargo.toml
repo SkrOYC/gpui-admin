@@ -1,0 +1,33 @@
+[package]
+name = "gpui-admin-cli"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+description = "The gpui-admin command-line tool: schema introspection, snapshotting, and scaffolding."
+license.workspace = true
+repository.workspace = true
+authors.workspace = true
+
+[[bin]]
+name = "gpui-admin"
+path = "src/main.rs"
+
+[dependencies]
+gpui-admin-core.workspace = true
+clap.workspace = true
+postgres.workspace = true
+openapiv3.workspace = true
+syn.workspace = true
+quote.workspace = true
+prettyplease.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+tracing.workspace = true
+tracing-subscriber.workspace = true
+anyhow.workspace = true
+
+[dev-dependencies]
+insta.workspace = true
+
+[lints]
+workspace = true
