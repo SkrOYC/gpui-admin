@@ -2,10 +2,10 @@
 
 # Reproducible developer environment for gpui-admin.
 #
-# The committed `rust-toolchain.toml` remains the source of truth for non-Nix
-# contributors and CI (their rustup honours it). Inside this devenv shell Rust is
-# provided by rust-overlay instead of rustup, so the two are kept in agreement by
-# hand — both pin 1.95.0.
+# The committed `rust-toolchain.toml` is the source of truth for non-Nix
+# contributors (their rustup honours it automatically). Inside this devenv shell
+# Rust is provided by rust-overlay instead of rustup, and CI pins the version
+# explicitly in ci.yml — all three are kept in agreement by hand on 1.95.0.
 #
 # GPUI compiles against a native graphics/windowing/font stack; on Linux those
 # libraries are supplied here. On macOS they are system frameworks (Metal /
@@ -54,12 +54,16 @@ in
   };
 
   # --- Convenience: run the full local gate exactly as CI does ---
+  # Mirrors ci.yml: RUSTFLAGS=-D warnings (workflow-wide there) and --locked on
+  # every cargo step, so a green local run cannot turn red on push over a plain
+  # rustc warning or a stale Cargo.lock.
   scripts.ci.exec = ''
     set -euo pipefail
+    export RUSTFLAGS="-D warnings"
     cargo fmt --all -- --check
-    cargo clippy --workspace --all-targets -- -D warnings
-    cargo build --workspace
-    cargo test --workspace
+    cargo clippy --workspace --all-targets --locked -- -D warnings
+    cargo build --workspace --locked
+    cargo test --workspace --locked
   '';
 
   enterShell = ''

@@ -4,4 +4,4 @@
 //! This crate depends on `gpui` but never on `gpui-component`; the widget layer
 //! lives in `gpui-admin-ui`. Implementation lands in Epics B-D.
 #![deny(missing_docs)]
-#![deny(clippy::unwrap_used, clippy::expect_used)]
+#![cfg_attr(not(test), deny(clippy::unwrap_used, clippy::expect_used))]

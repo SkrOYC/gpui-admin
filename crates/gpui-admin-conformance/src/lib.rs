@@ -3,4 +3,4 @@
 //! implements it. Depends only on `gpui-admin-core`'s public contracts.
 //! Implementation lands in Epic B.
 #![deny(missing_docs)]
-#![deny(clippy::unwrap_used, clippy::expect_used)]
+#![cfg_attr(not(test), deny(clippy::unwrap_used, clippy::expect_used))]
