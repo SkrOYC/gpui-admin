@@ -1,2 +1,7 @@
 /target
 .claude/
+
+# devenv / direnv
+.devenv/
+.direnv/
+devenv.local.nix

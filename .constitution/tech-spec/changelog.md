@@ -1,5 +1,12 @@
 # Stage 3 Changelog — `.constitution/tech-spec/`
 
+## v0.1.1 — 2026-07-10
+
+Patch: substrate BOM correction discovered during Epic A (GA-A001) execution.
+
+- Removed the non-existent `gpui_platform = "=0.2.2"` from the substrate family in `stack.md`, `adrs/ADR-004-exact-pin-substrate.md`, and the Compatibility Policy. Live crates.io verification (2026-07-10) shows the crate returns 404 under every name/version and is absent from `gpui 0.2.2`'s dependency graph. GPUI selects its platform backend via **feature flags on `gpui`** (`wayland`/`x11` default-on for Linux, `metal` for macOS), so no sibling crate — and no version substitution — is required. The substrate family is now three crates: `gpui`, `gpui-component`, `gpui_http_client`.
+- No other pins changed; all remaining BOM entries re-confirmed resolvable on 2026-07-10.
+
 ## v0.1.0 — 2026-07-09
 
 Initial implementation constitution, derived from `.constitution/prd/` v0.1.0 and `.constitution/architecture/` v0.1.0. All version pins verified against crates.io/upstream source on this date.

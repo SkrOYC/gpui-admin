@@ -1,0 +1,17 @@
+[package]
+name = "gpui-admin-conformance"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+
+[dependencies]
+gpui-admin-core.workspace = true
+gpui_http_client.workspace = true
+
+[dev-dependencies]
+gpui.workspace = true
+insta.workspace = true
+anyhow.workspace = true
+
+[lints]
+workspace = true
