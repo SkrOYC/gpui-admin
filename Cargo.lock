@@ -2458,7 +2458,6 @@ version = "0.0.1"
 dependencies = [
  "gpui-admin-core",
  "gpui_http_client",
- "reqwest",
  "serde",
  "serde_json",
 ]

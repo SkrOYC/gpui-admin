@@ -7,7 +7,6 @@ rust-version.workspace = true
 [dependencies]
 gpui-admin-core.workspace = true
 gpui_http_client.workspace = true
-reqwest.workspace = true
 serde.workspace = true
 serde_json.workspace = true
 
