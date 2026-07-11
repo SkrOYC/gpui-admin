@@ -2,35 +2,30 @@
 
 ## 0. Version
 
-**v0.1.0** — see [`changelog.md`](./changelog.md).
+**v0.1.2** — see [`changelog.md`](./changelog.md).
 
 ## Active Backlog Summary
 
-- **Total Active Story Points:** **121** (Epic A: 9 · B: 18 · C: 21 · D: 26 · E: 20 · F: 27 — 36 tickets, 2 of them Spikes)
+- **Total Active Story Points:** **112** (Epic B: 18 · C: 21 · D: 26 · E: 20 · F: 27 — 31 tickets, 2 of them Spikes). Epic A (Foundation & OSS Bootstrap — 9 pts, 5 tickets) completed 2026-07-10 and archived to `completed/`.
 - **Execution discipline:** one branch per epic (`type/description`), whole-epic squash PR into protected `master`, epics executed serially A → F (interview decision).
-- **Critical Path (dependency spine gating Phase 1 completion):**
-  1. GA-A001 (workspace)
-  2. GA-B001 → GA-B002 → GA-B003 (contract core)
-  3. GA-B005 → GA-B006 (conformance + mock)
-  4. GA-C001 (tracer resource + minimal replica)
-  5. GA-C002 (windowed seam) → GA-C005 (scroll spike — RSK-03 gate)
-  6. GA-C003 (form/mutation/undo seam)
-  7. GA-D001 → GA-D002 → GA-D003 (store, query layer, overlay lifecycle)
-  8. GA-D004 → GA-D005 / GA-D006 → GA-D007 (invalidation, freshness, feed → interleaving suite)
-  9. GA-E001 (emitter) → GA-E004 / GA-E005 → GA-E006 (frontends → equivalence)
-  10. GA-F001 (builder surface) → GA-F002 (derivation — RSK-05 gate via GA-F006) → GA-F003 → GA-F004 / GA-F005 / GA-F007
+- **Critical Path (dependency spine gating Phase 1 completion; the GA-A001 foundation it builds on is complete):**
+  1. GA-B001 → GA-B002 → GA-B003 (contract core)
+  2. GA-B005 → GA-B006 (conformance + mock)
+  3. GA-C001 (tracer resource + minimal replica)
+  4. GA-C002 (windowed seam) → GA-C005 (scroll spike — RSK-03 gate)
+  5. GA-C003 (form/mutation/undo seam)
+  6. GA-D001 → GA-D002 → GA-D003 (store, query layer, overlay lifecycle)
+  7. GA-D004 → GA-D005 / GA-D006 → GA-D007 (invalidation, freshness, feed → interleaving suite)
+  8. GA-E001 (emitter) → GA-E004 / GA-E005 → GA-E006 (frontends → equivalence)
+  9. GA-F001 (builder surface) → GA-F002 (derivation — RSK-05 gate via GA-F006) → GA-F003 → GA-F004 / GA-F005 / GA-F007
 
 ## Build Order Diagram
 
 ```mermaid
 flowchart LR
-    subgraph A[Epic A — Foundation & OSS]
-        A001[GA-A001] --> A002[GA-A002]
-        A001 --> A003[GA-A003]
-        A002 --> A004[GA-A004]
-        A002 --> A005[GA-A005]
-        A003 --> A005
-    end
+    %% Epic A (Foundation & OSS Bootstrap) completed 2026-07-10 — see completed/.
+    %% Its outputs (workspace, CI, licensing, crate reservations, protected master)
+    %% are the substrate B/E build on; GA-A001's gating edges are therefore satisfied.
     subgraph B[Epic B — Contract & Conformance]
         B001[GA-B001] --> B002[GA-B002] --> B003[GA-B003] --> B005[GA-B005] --> B006[GA-B006]
         B004[GA-B004]
@@ -58,10 +53,6 @@ flowchart LR
         F002 --> F006[GA-F006 spike]
         F002 --> F007[GA-F007]
     end
-    A001 --> B001
-    A001 --> B004
-    A001 --> E001
-    A001 --> E002
     B006 --> C001
     C001 --> D001
     D003 --> F001
