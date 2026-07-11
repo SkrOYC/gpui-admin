@@ -34,7 +34,7 @@ Then gpui, gpui-component and gpui_http_client are exact-pinned ("=x.y.z")
 
 - **Touched Files (outside the declared Scope):**
   - `devenv.nix`, `devenv.yaml`, `devenv.lock`, `.envrc` (committed in a preceding foundation commit)
-  - `.constitution/tech-spec/stack.md`, `.constitution/tech-spec/adrs/ADR-004-exact-pin-substrate.md`, `.constitution/tech-spec/changelog.md`
+  - `.constitution/tech-spec/stack.md`, `.constitution/tech-spec/adrs/ADR-004-exact-pin-substrate.md`, `.constitution/tech-spec/guidelines.md` (Developer Environment section + dependency-direction wording), `.constitution/tech-spec/changelog.md`
   - `.constitution/tasks/active/EPIC-A-foundation-oss-bootstrap.md` (this file — the Gherkin line above)
 - **Justification:**
   - **devenv (operator request + build necessity):** the operator asked to use devenv for tooling, and this ticket's Gherkin ("all seven crates compile") requires a real compile of the GPUI substrate, which needs a reproducible native graphics/windowing/font stack (wayland, xkbcommon, xorg, vulkan-loader, fontconfig, freetype). The in-scope `rust-toolchain.toml` still pins Rust 1.95.0 for non-Nix contributors and CI; devenv provides that same toolchain plus the system libraries.

@@ -1,5 +1,14 @@
 # Stage 4 Changelog — `.constitution/tasks/`
 
+## v0.1.2 — 2026-07-10
+
+Epic A (Foundation & OSS Bootstrap) completed and archived.
+
+- **All five tickets done.** GA-A001 (7-crate workspace + exact-pinned substrate, `Cargo.lock` committed), GA-A002 (MIT licensing + metadata), GA-A003 (Linux+macOS CI — verified green on both P0 platforms), GA-A004 (all seven crates published to crates.io as `0.0.1` placeholders), GA-A005 (repo public + `master` branch protection: PR required, the three CI checks required, no force-push, linear history). Delivered via PR #2 (whole-epic squash, commit `5a966ea`) after a dual-axis review loop that reached two consecutive rounds with no P0/P1 findings; branch protection and this closure landed in a follow-up PR once `master` was gated.
+- **Archived** `active/EPIC-A-foundation-oss-bootstrap.md` → `completed/` via `git mv`.
+- **Recomputed `critical-path.md`:** active story points **121 → 112**, epics **6 → 5** (B–F, 31 tickets, 2 Spikes); removed GA-A001 from the dependency spine and the Epic A subgraph (and its gating edges) from the build-order diagram; advanced the file's version header from its lagging v0.1.0 to v0.1.2.
+- **Ledger completeness:** added `tech-spec/guidelines.md` to GA-A001's `Deviations & Justifications` touched-files list (surfaced by PR review), so the archived record enumerates every constitution file the ticket touched.
+
 ## v0.1.1 — 2026-07-10
 
 Epic A execution progress (the epic remains **active** — see the still-open remote tail below).
