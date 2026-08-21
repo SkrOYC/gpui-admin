@@ -10,7 +10,7 @@ The Replica (R2) + Mutation Coordinator (R3) pair is the hardest logic in the sy
 ## RSK-02 — Foundation churn beneath the client
 
 The run-time containers presuppose a reactive native UI substrate that is still pre-1.0 (per the pre-constitution verification record). Breaking substrate changes tax every UI container (R5/R6) at once.
-**Mitigation:** the substrate family is tracked via git at lockfile-frozen revs with dual-location manifests (supersedes the registry-only policy; see tech-spec ADR superseding ADR-004) — upgrades are deliberate, reviewed acts: one PR, re-freezing all revs together, re-exercising the tracer-bullet seams. Publishes gate on upstream registry releases catching up, verified by a CI lane resolving from the registry alone. The windowed-list and dock integration seams are proven by the earliest milestone before deep investment; R2/R3/R1/R10/C1 are substrate-independent by design, confining churn to the presentation half.
+**Mitigation:** the substrate family is tracked via git at lockfile-frozen revs with dual-location manifests (tech-spec ADR-011 supersedes ADR-004's registry-only policy) — upgrades are deliberate, reviewed acts: one PR, re-freezing all revs together, re-exercising the tracer-bullet seams. Publishes gate on upstream registry releases catching up, verified by a CI lane resolving from the registry alone. The windowed-list and dock integration seams are proven by the earliest milestone before deep investment; R2/R3/R1/R10/C1 are substrate-independent by design, confining churn to the presentation half.
 
 ## RSK-03 — Windowed-browsing ergonomics at the 10M envelope
 
