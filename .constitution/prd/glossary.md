@@ -26,5 +26,11 @@ Canonical domain terms. Downstream stages, code, and conversation must use these
 | Follow | Live master-detail linkage in which a detail Panel tracks a List Panel's selection. Browsing-only. | sync, link, binding |
 | Pending Change | An optimistic local mutation shown immediately but not yet confirmed by the Backend. | draft, dirty write, queued edit |
 | Undo Window | The brief period during which a Pending Change can be revoked before it is dispatched; revoked changes never reach the Backend. | grace period, rollback |
-| Deep Link | A shareable address identifying a single primary Panel; never encodes a full Workspace. | URL, permalink |
+| Deep Link | A shareable address under the application's declared scheme, identifying one primary Panel and optionally the typed Query behind it; never encodes a full Workspace or personal layout. | URL, permalink |
+| Object Store | The pluggable external storage for binary objects (files, images), addressed by an independent contract beside the Provider; ships with an industry-standard first-party implementation. Unconfigured apps degrade to reference-as-text fields, never break. | blob storage, file system |
+| Saved Query | A named, shareable Filter/Sort/Search combination over one Resource, serializable into a Deep Link and bookmarkable locally by an Operator. | preset view, smart folder |
+| Draft | Operator form input persisted locally before dispatch, restored verbatim after relaunch or crash, cleared on confirmed save or discard. Never sent to the Backend. | autosave, session state |
+| Provider Binding | The build-time association between one Resource and one Provider, allowing a single application to span multiple Backends. | connection mapping |
+| Junction | A Resource whose Snapshot shows exactly two foreign-key relations, serving as the join table for a Many-to-Many declaration between two other Resources. | join table, pivot |
+| Quick Edit | Single-Field inline editing directly in a List row for simple widgets, dispatched through the same Pending Change lifecycle as forms; not an Edit Panel. | inline editing, cell edit |
 | Conformance Suite | The public test harness any Provider implementation must pass to be considered valid. | test kit, certification |

@@ -10,6 +10,7 @@ All constraints are measurable acceptance gates, not aspirations. "Reference har
 | NFC-02 | Cold start to an interactive, restored Workspace. | < 500 ms on reference hardware, excluding first Backend response. |
 | NFC-03 | A Pending Change is visible in every affected open Panel. | Within one frame of the Operator's action (~16 ms); Backend latency never delays the optimistic presentation. |
 | NFC-04 | Interaction feedback (click, focus, panel drag, tab switch). | < 100 ms perceived response; no interaction blocks on network. |
+| NFC-05 | Warm memory envelope during active administration at scale. | **Scale:** resident set with one 10,000,000-Record Resource under continuous browsing on reference hardware. **Meter:** instrumented run, methodology fixed by the post-spike measurement ticket. **Goal:** ≤ 1 GB RSS (initial target; recalibrated by measurement before release hardening). **Fail:** > 2 GB sustained, or unbounded growth over an hour-long session. |
 
 ## Build & Iteration (the Adopter's experience)
 
@@ -33,7 +34,7 @@ All constraints are measurable acceptance gates, not aspirations. "Reference har
 | ID | Constraint | Measure |
 | :--- | :--- | :--- |
 | NFC-30 | The client is never the enforcement boundary. | Every mutation path remains correct (fails safely, surfaces the denial) when the Backend rejects it; UI affordances are demonstrably advisory. |
-| NFC-31 | No telemetry, phone-home, or external service contact unless the Adopter explicitly configures it. | Network capture on a default build shows connections only to the configured Backend. |
+| NFC-31 | No telemetry, phone-home, or external service contact unless the Adopter explicitly configures it. | Network capture on a default build shows connections only to the configured Backend and configured Object Store. Distribution, update checking, and error reporting are wholly the Adopter application's concerns; the framework's only extensibility seam for exporters is the framework's standard structured-logging subscriber hook. |
 | NFC-32 | The framework never persists credentials in plaintext. | Secrets at rest use the platform's secure storage or are absent. |
 
 ## Operability & Distribution
