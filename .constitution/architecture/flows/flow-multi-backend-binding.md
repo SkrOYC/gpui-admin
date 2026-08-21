@@ -1,0 +1,32 @@
+# Flow: Multi-Backend Binding & Cross-Provider Relations
+
+**Mapping:** CAP-607 (per-Resource Provider Binding), CAP-405 (cross-provider Relations, structurally verified only). Extends the Provider contract flow.
+
+Each Resource carries a build-time Provider Binding (default binding covers single-Backend apps). Each Provider owns a namespaced Schema Snapshot; the Registry resolves handlers per binding and keeps Replicas warm per Resource regardless of which Backend serves them.
+
+```mermaid
+sequenceDiagram
+    participant APP as Adopter application (build time)
+    participant R4 as R4 Registry
+    participant R6 as R6 View & Form Engine
+    participant GA as Gateway (Provider A)
+    participant GB as Gateway (Provider B)
+    participant BEA as Backend A
+    participant BEB as Backend B
+
+    Note over APP: build: declarations verified against their OWN<br/>binding's Snapshot; cross-binding Relation declared<br/>by hand → structural check only (target registered,<br/>types compatible) → visible UNVERIFIED marker (CAP-405)
+
+    APP->>R4: register Resources with bindings
+    R4->>R4: boot assertions: relation targets registered across<br/>bindings; missing target = launch failure (CAP-402)
+
+    Note over R6,BEB: run time — same machinery, routed per binding
+    R6->>GA: query users (bound to A)
+    GA->>BEA: read
+    BEA-->>GA: rows → Replica(users)
+    R6->>GB: embedded has-many list for invoices (bound to B)
+    GB->>BEB: read
+    BEB-->>GB: rows → Replica(invoices)
+    Note over R6: embedded related List through a foreign binding uses<br/>the SAME windowed/freshness machinery; its latency and<br/>failures are contained to that panel (degraded UX rules apply)
+```
+
+**Failure paths:** one Backend unreachable degrades only that binding's panels (connectivity state is per-Gateway); a cross-provider relation renders contained errors when its foreign side fails — the domestic side stays fully usable. Verification honesty: Snapshot-backed checks exist only within a binding; anything crossing bindings says so in build output.

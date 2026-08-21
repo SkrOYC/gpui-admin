@@ -1,6 +1,6 @@
 # Flow: Mutation Lifecycle (Create / Edit / Delete)
 
-**Mapping:** CAP-301 (typed forms, entry-time validation), CAP-302 (honest optimistic presentation), CAP-303 (Undo Window; revoked = never sent), CAP-304 (rejection preserves input, retry/discard), CAP-305 (Backend validation lands on the exact Field). Supports NFC-03 (one-frame optimistic visibility), NFC-21.
+**Mapping:** CAP-301 (typed forms, entry-time validation), CAP-302 (honest optimistic presentation), CAP-303 (Undo Window; revoked = never sent; duration Adopter-configurable per Resource), CAP-304 (rejection preserves input, retry/discard), CAP-305 (Backend validation lands on the exact Field, overriding client verdicts), CAP-308 (destructive actions require explicit confirmation before staging). Quick Edit (CAP-310) rides this same lifecycle with the row as the feedback surface instead of a form. File/image Fields add the Object Upload Lifecycle flow at dispatch. Supports NFC-03 (one-frame optimistic visibility), NFC-21.
 
 The system's most important flow. Staged → in-flight → settled, with the Undo Window making the common regret path a non-event.
 
@@ -14,7 +14,7 @@ sequenceDiagram
     participant R1 as R1 Provider Gateway
     participant BE as Backend
 
-    O->>R6: edit Fields (each keystroke: parse → domain rules;<br/>typed value preserved even when a rule fails)
+    O->>R6: edit Fields (each keystroke: parse → rules — declarative<br/>core set + Adopter closures; typed value preserved even when<br/>a rule fails; Draft debounced to R9 — see Draft Persistence flow)
     O->>R6: save
     R6->>R6: cross-field validation over typed values
     R6->>R3: mutation intent (sparse patch: dirty Fields only,<br/>+ previous state)
@@ -23,6 +23,8 @@ sequenceDiagram
     R2-->>R6: view reflects change within one frame (NFC-03)
     Note over R6: pending CREATE renders in a provisional band —<br/>never faked into a server-ordered position (CAP-302)
     R3->>R5: undo affordance visible (Undo Window running)
+
+    Note over O,R5: DELETE path additionally requires explicit confirmation<br/>BEFORE staging (CAP-308) — confirmation gates intent,<br/>the Undo Window still guards regret after it
 
     alt Operator revokes during Undo Window
         O->>R5: undo

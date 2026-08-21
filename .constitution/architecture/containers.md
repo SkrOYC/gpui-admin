@@ -1,6 +1,6 @@
 # Logical Containers
 
-Two bounded contexts (Build-Time, Run-Time) plus one shared contract boundary. External systems: the **Backend** (sovereign system of record), the **Schema Source**, and the **operating system shell** (window management; link handling at P1).
+Two bounded contexts (Build-Time, Run-Time) plus shared contract boundaries. External systems: the **Backend** or Backends (sovereign systems of record — Resources may bind to different ones), the **Object Store** (configured binary storage beside the Backend), the **Schema Source**, and the **operating system shell** (window management; link handling at P1).
 
 ---
 
@@ -17,7 +17,7 @@ Two bounded contexts (Build-Time, Run-Time) plus one shared contract boundary. E
 ### B2 — Schema Snapshot Store
 
 - **Logical Type:** Committed repository artifact (storage boundary).
-- **Responsibility:** Hold the machine-owned, versioned, human-reviewable capture of external truth. Discipline: regeneration always overwrites; hand-edits are prohibited; every schema change appears as a reviewable diff (CAP-101).
+- **Responsibility:** Hold machine-owned, versioned, human-reviewable captures of external truth — one namespaced Snapshot per bound Provider/Source pair. Content includes type-faithful temporal kinds, exact-numeric scalars, nullability, server-owned classification, unique constraints, enums, relations, Junction candidates (dual-FK tables), and self-referencing Relation flags. Discipline: regeneration always overwrites; hand-edits are prohibited; every schema change appears as a reviewable diff (CAP-101).
 - **Inputs:** Snapshots from B1.
 - **Outputs:** Snapshot content consumed by B3 and B4 via file handoff.
 - **Depends on:** Nothing at run time. This artifact is why builds are air-gap-compatible (NFC-11).
@@ -45,7 +45,7 @@ Two bounded contexts (Build-Time, Run-Time) plus one shared contract boundary. E
 ### C1 — Provider Contract & Conformance Suite
 
 - **Logical Type:** Library boundary + executable test harness.
-- **Responsibility:** Define the Provider contract (elementary reads, windowed lists, sparse mutations carrying previous-state, structured error taxonomy) and the Capability declarations (realtime change feed, cursor paging, conditional update, counting); prove any Provider implementation against it (CAP-601/602/603). The first-party verified Provider (CAP-604) is a consumer of this boundary with no private privileges.
+- **Responsibility:** Define the Provider contracts — singular and bulk reads/writes over windowed lists, sparse mutations carrying previous-state, structured error taxonomy, advisory permission vocabulary, and the Capability declarations (realtime change feed, cursor paging, conditional update, counting); plus the independent ObjectStore port contract; prove any implementation against them (CAP-601/602/603). First-party implementations are consumers with no private privileges.
 - **Inputs:** A candidate Provider implementation.
 - **Outputs:** Conformance verdicts; the contract consumed by R1 and by Contributors (CAP-1003).
 - **Depends on:** Nothing else in the system — deliberately, so third parties can build against it in isolation.
@@ -56,11 +56,20 @@ Two bounded contexts (Build-Time, Run-Time) plus one shared contract boundary. E
 
 ### R1 — Provider Gateway
 
-- **Logical Type:** Port/boundary (hexagonal edge).
-- **Responsibility:** Sole communication path to the Backend. Translates typed requests into Backend-specific transport; surfaces declared Capabilities to the rest of the client; normalizes every failure into the structured error taxonomy (unauthenticated / forbidden / not-found / unsupported-query / field-validation / conflict / transport / provider-internal); hosts the optional change-feed channel including reconnect detection.
-- **Inputs:** Typed read/window/mutation requests (in-process, async request-response); change-feed events (async event stream, when the Capability exists).
+- **Logical Type:** Port/boundary (hexagonal edge), instantiated per declared Provider Binding.
+- **Responsibility:** Sole communication path to its Backend. Translates typed requests — including bulk forms — into Backend-specific transport; surfaces declared Capabilities to the rest of the client; normalizes every failure into the structured error taxonomy (unauthenticated / forbidden / not-found / unsupported-query / field-validation / conflict / transport / provider-internal); hosts the optional change-feed channel including reconnect detection; exposes per-binding connectivity state.
+- **Inputs:** Typed read/window/mutation requests routed by Resource Binding (in-process, async request-response); change-feed events (async event stream, when the Capability exists).
 - **Outputs:** Typed results and normalized errors to R2/R3; connectivity state to R5/R8; feed events to R2.
-- **Depends on:** External Backend; C1 contract.
+- **Depends on:** Its bound external Backend; C1 contracts.
+
+### R10 — Object Store Port
+
+- **Logical Type:** Port/boundary (hexagonal edge) + first-party adapter.
+- **Responsibility:** The only path to binary-object storage: put/get/delete objects, progress surfacing, and best-effort cleanup deletion with orphan reporting to R8. Independent of the data Provider by design; absent configuration, callers degrade honestly (reference-as-text fields) rather than fail (CAP-608).
+- **Inputs:** Object bytes and lifecycle commands from R3 (dispatch-time upload/cleanup).
+- **Outputs:** Object references into mutation payloads; progress/error events to R6/R5.
+- **Depends on:** The configured external Object Store; nothing else in the client.
+- **Deletion test:** folding it into R1 would couple record truth to storage vendors and forfeit the unconfigured-degradation path.
 
 ### R2 — Resource Replica
 
@@ -73,15 +82,15 @@ Two bounded contexts (Build-Time, Run-Time) plus one shared contract boundary. E
 ### R3 — Mutation Coordinator
 
 - **Logical Type:** In-process orchestrator.
-- **Responsibility:** The mutation lifecycle: stage a Pending Change (overlay via R2) and run its Undo Window — revocation means the change is *never dispatched* (CAP-303); enforce per-Record FIFO dispatch; dispatch via R1 with sparse patch + previous-state; settle outcomes — confirmation graduates the change, rejection rolls back the overlay, preserves Operator input, routes field-validation errors to the owning form (R6) and everything else to the feedback surface (R5) even when the form is gone (CAP-302/304/305).
-- **Inputs:** Mutation intents from R6; settlement results from R1.
-- **Outputs:** Overlay commands to R2; feedback events to R5; validation routing to R6.
+- **Responsibility:** The mutation lifecycle: stage a Pending Change (overlay via R2) and run its Undo Window — revocation means the change is *never dispatched* (CAP-303); enforce per-Record FIFO dispatch; for file/image mutations, upload via R10 first and only then dispatch the record write (object-first ordering; rejection/revocation triggers best-effort cleanup); dispatch bulk operations through the contract's bulk forms; settle outcomes — confirmation graduates the change, rejection rolls back the overlay, preserves Operator input, routes field-validation errors to the owning form (R6) and everything else to the feedback surface (R5) even when the form is gone (CAP-302/304/305).
+- **Inputs:** Mutation intents from R6; settlement results from R1; object lifecycle commands/results with R10 (upload at dispatch, cleanup on failure).
+- **Outputs:** Overlay commands to R2; feedback events to R5; validation routing to R6; upload/cleanup commands to R10.
 - **Depends on:** R1, R2. **Deletion test:** deleting it smears undo timing, ordering, and failure routing across R2, R5, and R6.
 
 ### R4 — Resource Registry
 
 - **Logical Type:** Composition & resolution boundary.
-- **Responsibility:** Owns the system's only two dynamic-resolution points ("airlocks"): (1) runtime string → concrete Resource handler, serving both Deep Links and Workspace restoration through one mechanism (CAP-505/502); (2) cross-Resource typed edges for Relations, resolved once and cached (CAP-401/403). Holds the owning handles that keep Replicas warm (visited *or* referenced); runs startup completeness assertions so an unregistered Relation target or Panel kind fails at launch, not mid-session (CAP-402).
+- **Responsibility:** Owns the system's only two dynamic-resolution points ("airlocks"): (1) runtime string → concrete Resource handler under the application's declared link scheme, serving Deep Links (with optional typed Query payloads), Saved Query bookmarks, and Workspace restoration through one mechanism (CAP-505/502/208); (2) cross-Resource typed edges for Relations — resolved once and cached, honor each side's Provider Binding and visibly flagging cross-binding edges as structurally-verified-only (CAP-401/403/405). Holds the owning handles that keep Replicas warm (visited *or* referenced); runs startup completeness assertions so an unregistered Relation target or Panel kind fails at launch, not mid-session (CAP-402).
 - **Inputs:** Resolution requests from R5/R6; registrations from derived artifacts at startup.
 - **Outputs:** Concrete handlers/edges; startup assertion failures.
 - **Depends on:** B4's derived artifacts, R2 instances it owns.
@@ -89,7 +98,7 @@ Two bounded contexts (Build-Time, Run-Time) plus one shared contract boundary. E
 ### R5 — Workspace Shell
 
 - **Logical Type:** UI orchestration container.
-- **Responsibility:** One Workspace per OS window, all in one process: panel tree with split/tab/float; Follow linkage as panel-local selection observation (browse-only); Edit panels keyed by (Resource, Record) with focus-not-duplicate (CAP-503/504); Workspace persistence/restore through R9 and R4 (CAP-501/502); Deep Link entry incl. single-instance activation → new Workspace window (CAP-505); the application-wide feedback surface (notifications, connectivity status, degraded-mode banner); routing of re-authentication interruptions from R7.
+- **Responsibility:** One Workspace per OS window, all in one process: panel tree with split/tab/float; declaration-driven navigation sidebar (grouped resources) and panel breadcrumbs; global command palette (jump-to-resource/record/action, keyboard-first); Follow linkage as panel-local selection observation (browse-only); Edit panels keyed by (Resource, Record) with focus-not-duplicate (CAP-503/504); prev/next record navigation within source-list orderings (CAP-209); destructive-action confirmation gating before staging (CAP-308); Workspace persistence/restore through R9 and R4 (CAP-501/502); Deep Link entry incl. single-instance activation → new Workspace window (CAP-505); OS-following light/dark theming on substrate tokens with Adopter accent (CAP-509); the application-wide feedback surface (notifications, connectivity status, degraded-mode banner); routing of re-authentication interruptions from R7.
 - **Inputs:** Operator window/panel actions; restore payloads (R9); feedback events (R3/R1/R7).
 - **Outputs:** Mounted Views (R6); persisted layouts (R9).
 - **Depends on:** R4, R6, R9, R7.
@@ -97,7 +106,7 @@ Two bounded contexts (Build-Time, Run-Time) plus one shared contract boundary. E
 ### R6 — View & Form Engine
 
 - **Logical Type:** UI presentation container (statically specialized per Resource).
-- **Responsibility:** The four core Views. Lists: windowed binding — visible range demands windows from R2, placeholders for unloaded rows, provisional band for pending creations, contained error boundary per drifted Record (CAP-201/202/204/205, 302); typed Filters/sort/Search controls (CAP-202/203). Forms: per-Field state machine (parse → domain rules) preserving typed input, cross-field validation at submission assembly, dirty tracking, Backend validation errors landed on the exact Field, and the non-blocking mid-edit drift warning (CAP-301/305/306).
+- **Responsibility:** The four core Views plus the declaration-derived input catalog. Lists: windowed binding — visible range demands windows from R2, placeholders for unloaded rows, provisional band for pending creations, contained error boundary per drifted Record (CAP-201/202/204/205, 302); typed Filters/sort/Search controls with labeled loaded-window fallback when Search is unsupported (CAP-202/203); operator column masks applied read-only over declared Projections (CAP-207); Quick Edit on simple widgets through the standard mutation lifecycle (CAP-310); m2m multi-select pickers over Junction-filtered queries (CAP-404); hierarchy cues for self-referencing Resources (CAP-212); prev/next navigation affordances fed by source-list orderings (CAP-209). Forms: catalog-driven widgets incl. exact-decimal numbers and type-faithful temporal rendering (CAP-312/211), declarative-rule + closure validation layers preserving typed input, cross-field validation at submission assembly, dirty tracking feeding Draft persistence, Backend validation errors landed on the exact Field with final precedence, and the non-blocking mid-edit drift warning (CAP-301/305/306).
 - **Inputs:** Query views and change notifications (R2); validation routing (R3); Operator input.
 - **Outputs:** Window demands and observations (R2); mutation intents (R3).
 - **Depends on:** R2, R3, R4 (relation edges).
@@ -121,9 +130,9 @@ Two bounded contexts (Build-Time, Run-Time) plus one shared contract boundary. E
 ### R9 — Local State Store
 
 - **Logical Type:** Storage boundary (per-machine).
-- **Responsibility:** Persist and restore Workspace layouts and application preferences locally (CAP-502, NFC-22). Never stores Backend data, credentials in plaintext (NFC-32), or anything shareable — Deep Links deliberately do not pass through here.
-- **Inputs:** Layout snapshots from R5.
-- **Outputs:** Restore payloads to R5.
+- **Responsibility:** Persist and restore Workspace layouts, application preferences, per-Resource column masks and sort overrides, Saved Query bookmarks, and form Drafts locally (CAP-502, 207, 208, 309; NFC-22). Never stores credentials in plaintext (NFC-32) or anything shareable — Deep Links deliberately do not pass through here; bookmarks store queries, links stay content.
+- **Inputs:** Layout snapshots, masks, bookmarks, and Drafts from R5/R6.
+- **Outputs:** Restore payloads to R5/R6.
 - **Depends on:** Local filesystem/platform storage facilities.
 
 ---
@@ -136,7 +145,8 @@ C4Container
     Person(adopter, "Adopter")
     Person(operator, "Operator")
     System_Ext(schemaSource, "Schema Source", "DB catalog / API description")
-    System_Ext(backend, "Backend", "Sovereign system of record")
+    System_Ext(backend, "Backend(s)", "Sovereign system(s) of record")
+    System_Ext(objectStore, "Object Store", "Configured binary-object storage")
 
     Boundary(bt, "Build-Time Context (offline)") {
         Container(b1, "B1 Introspection Frontends", "CLI adapters", "Source → neutral Snapshot semantics")
@@ -150,15 +160,16 @@ C4Container
     }
 
     Boundary(rt, "Run-Time Context (single process, N Workspace windows)") {
-        Container(r5, "R5 Workspace Shell", "UI orchestration", "Panels, Follow, restore, feedback")
-        Container(r6, "R6 View & Form Engine", "UI presentation", "4 Views, windowed lists, typed forms")
+        Container(r5, "R5 Workspace Shell", "UI orchestration", "Panels, nav+palette, Follow, restore, feedback")
+        Container(r6, "R6 View & Form Engine", "UI presentation", "4 Views, input catalog, windowed lists, typed forms")
         Container(r4, "R4 Resource Registry", "Resolution boundary", "Airlocks, warmth, startup asserts")
         Container(r2, "R2 Resource Replicas", "State authority (per Resource)", "Records, queries, overlay, invalidation")
-        Container(r3, "R3 Mutation Coordinator", "Orchestrator", "Undo Window, FIFO, settlement")
-        Container(r1, "R1 Provider Gateway", "Port", "Sole Backend path; error taxonomy; feed")
+        Container(r3, "R3 Mutation Coordinator", "Orchestrator", "Undo Window, FIFO, object-first uploads, settlement")
+        Container(r1, "R1 Provider Gateways", "Port (per binding)", "Sole Backend paths; error taxonomy; feed")
+        Container(r10, "R10 Object Store Port", "Port", "Binary objects; cleanup; orphan reports")
         Container(r7, "R7 Session & Access", "Identity boundary", "Auth surface, affordances")
         Container(r8, "R8 Diagnostics & Logging", "Observability", "Traces, dev panel; local only")
-        Container(r9, "R9 Local State Store", "Storage boundary", "Layouts & preferences")
+        Container(r9, "R9 Local State Store", "Storage boundary", "Layouts, preferences, masks, bookmarks, drafts")
     }
 
     Rel(adopter, b1, "invokes", "CLI")
@@ -179,7 +190,9 @@ C4Container
     Rel(r3, r2, "stages/settles overlay", "in-process")
     Rel(r3, r1, "dispatches (per-Record FIFO)", "async request-response")
     Rel(r2, r1, "fetches windows/records", "async request-response")
-    Rel(r1, backend, "reads/writes", "network request-response")
+    Rel(r1, backend, "reads/writes (bulk incl.)", "network request-response")
+    Rel(r3, r10, "uploads/cleans objects at dispatch", "in-process port call")
+    Rel(r10, objectStore, "put/get/delete objects", "network request-response")
     Rel(backend, r1, "change feed (Capability)", "async event stream")
     Rel(r7, r1, "session context; error routing", "in-process")
     Rel(r8, r2, "introspects", "in-process, dev-mode")

@@ -10,7 +10,7 @@ The Replica (R2) + Mutation Coordinator (R3) pair is the hardest logic in the sy
 ## RSK-02 — Foundation churn beneath the client
 
 The run-time containers presuppose a reactive native UI substrate that is still pre-1.0 (per the pre-constitution verification record). Breaking substrate changes tax every UI container (R5/R6) at once.
-**Mitigation:** exact-version pinning with deliberate, reviewed upgrades (policy binds at Stage 3); the windowed-list and dock integration seams are proven by the earliest milestone before deep investment; R2/R3/R1/C1 are substrate-independent by design, confining churn to the presentation half.
+**Mitigation:** the substrate family is tracked via git at lockfile-frozen revs with dual-location manifests (supersedes the registry-only policy; see tech-spec ADR superseding ADR-004) — upgrades are deliberate, reviewed acts: one PR, re-freezing all revs together, re-exercising the tracer-bullet seams. Publishes gate on upstream registry releases catching up, verified by a CI lane resolving from the registry alone. The windowed-list and dock integration seams are proven by the earliest milestone before deep investment; R2/R3/R1/R10/C1 are substrate-independent by design, confining churn to the presentation half.
 
 ## RSK-03 — Windowed-browsing ergonomics at the 10M envelope
 
@@ -52,8 +52,11 @@ Shared Replicas serving N Workspace windows mean one change fans out to every ob
 The dev-mode panel (R8) renders live Backend data and internal state; on a shared screen this is a disclosure hazard, and if ever left enabled in a distributed build, a support burden.
 **Mitigation:** developer mode is an explicit, visible, per-machine opt-in, off by default in every build; the panel is watermarked as diagnostic; logs redact secret-classified values at the R1 boundary by construction.
 
-## Structural debt accepted at v0.1.0
+## Structural debt accepted at v0.2.0
 
 - Two permanent pagination flows and two freshness flows (sovereignty cost — see `strategy.md`).
 - Sequential-Backend UX ceilings (no random jumps, optional totals) are permanent honest behavior, not debt to repay.
 - P1 identity work (CAP-702/703) is stubbed by design in v1: the none-mode default is first-class, and the error taxonomy already reserves the routes P1 will use — no rework anticipated, only addition.
+- Orphaned objects can exist after crashes between object-upload and record settlement; bounded by best-effort cleanup and made observable through R8's orphan report sweep rather than prevented.
+- Cross-binding Relations carry a permanently weaker verification tier than Snapshot-backed checks; documentation must keep the tiers loud so the marker is never mistaken for decoration.
+- Junction detection infers candidate junctions from dual-FK shape; non-pure junctions (attribute-bearing relation rows) require the explicit has-many fallback — misclassification surfaces as a Scaffold review comment, never silent behavior.

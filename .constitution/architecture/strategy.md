@@ -2,7 +2,7 @@
 
 ## 0. Version
 
-**v0.1.0** — see [`changelog.md`](./changelog.md).
+**v0.2.0** — see [`changelog.md`](./changelog.md).
 
 ## Architectural Pattern
 
@@ -31,3 +31,6 @@ Traceability to `.constitution/prd/`:
 - **Honesty over illusion in optimistic UI.** Pending creations are presented provisionally instead of faked into final positions; totals may be absent on sequential Backends; a brief post-confirmation flicker under concurrent change is tolerated as self-healing. These are deliberate UX ceilings, not defects.
 - **Single-process ceiling.** No horizontal or multi-process story; the scale envelope (NFC-42: ~200 Resources, tens of Operators against a Backend) is a stated design assumption, not an open promise.
 - **Last-write-wins residual.** Without the conditional-update Capability, concurrent edits can overwrite (PRD accepts this; CAP-306 warns, CAP-307 upgrades it where the Backend cooperates).
+- **A third egress boundary.** The Object Store adds one more configured network surface beside the Backend — accepted because binary content is unavoidable in real admins and an independent port keeps record truth vendor-neutral. Unconfigured apps keep two-boundary discipline.
+- **Multi-sovereign routing.** Per-Resource Provider Bindings multiply integration surface (one Gateway instance per binding) and create structurally-verified-only cross-binding Relations — accepted as the honest price of spanning systems.
+- **Staged grid-editing ambition.** Quick Edit ships P1 on existing machinery; full multi-cell editing waits on measured feasibility rather than optimism.

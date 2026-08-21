@@ -1,6 +1,6 @@
 # Flow: Typed Filters, Sort & Search
 
-**Mapping:** CAP-202 (typed Filters/sort, invalid Fields inexpressible), CAP-203 (free-text Search where the Backend supports it).
+**Mapping:** CAP-202 (typed Filters/sort, invalid Fields inexpressible, multi-column ordering expressible), CAP-203 (free-text Search where the Backend supports it; labeled client-side fallback where it does not). Column show/hide masks and prev/next navigation (CAP-207/209) operate over these same query entries without changing their identity.
 
 Filter and sort identity comes from build-time typed field identity — a nonexistent Field cannot be referenced. A changed (filter, sort) pair is a *different query entry*; results are never client-simulated.
 
@@ -36,6 +36,6 @@ sequenceDiagram
         BE-->>R1: matches
         R1-->>R2: install → render
     else not supported
-        R6-->>O: Search control absent for this Resource<br/>(affordance never lies)
+        R6-->>O: labeled client-side fallback: case-insensitive substring<br/>over LOADED window rows only, visibly badged "searching<br/>loaded rows" — honest partial coverage, never silent completeness
     end
 ```

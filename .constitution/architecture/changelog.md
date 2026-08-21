@@ -1,5 +1,22 @@
 # Stage 2 Changelog — `.constitution/architecture/`
 
+## v0.2.0 — 2026-08-21
+
+Realign Evolution pass over prd v0.2.0 (rulings: `../reports/2026-08-21-interview-realign.md`).
+
+### Added
+- **R10 Object Store Port** container (independent port + first-party adapter): sole path to binary-object storage; object-first upload ordering inside R3's dispatch with best-effort cleanup and R8 orphan reporting; unconfigured degradation to reference-as-text fields. Third named egress boundary.
+- **Per-Resource Provider Bindings:** R1 instantiated per binding; R4 resolution binding-aware; cross-binding Relations resolved as structurally-verified-only edges with visible markers; per-Gateway connectivity states.
+- **Flows:** new `flow-object-upload-lifecycle`, `flow-multi-backend-binding`, `flow-draft-persistence`, `flow-form-rendering-and-validation`, `flow-schema-migration-reconcile` (the previously-named-but-unspecified regenerate-and-reconcile workflow).
+- **Revised flows:** mutation-lifecycle (destructive-action confirmation CAP-308, Draft hooking, configurable Undo Window, Quick Edit riding the lifecycle), deep-link (declared scheme, typed Query payloads, Saved Query bookmarking), filter-sort-search (labeled loaded-window Search fallback replacing control-absence).
+- Containers updated for: declaration-driven sidebar/breadcrumbs/command palette and OS-following theming in R5; input catalog, column masks, Quick Edit, m2m pickers, hierarchy cues, temporal rendering in R6; drafts/masks/bookmarks payload classes in R9; bulk forms and permission vocabulary in C1; namespaced Snapshots with Junction/tree flags in B2.
+- Strategy trade-offs extended: third egress boundary, multi-sovereign routing, staged grid-editing ambition.
+- Risks: RSK-02 mitigation rewritten around git-frozen-rev substrate tracking; structural-debt register extended (orphaned objects, weak-tier relations, junction inference limits).
+
+## v0.1.1-reviewed — 2026-07-10
+
+Reviewed for upstream delta (prd v0.1.1, licensing change); no changes required — recorded retroactively; this entry was omitted at the time.
+
 ## v0.1.0 — 2026-07-09
 
 Initial architecture constitution, derived from `.constitution/prd/` v0.1.0.

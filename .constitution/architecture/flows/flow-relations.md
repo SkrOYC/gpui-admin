@@ -1,6 +1,6 @@
 # Flow: Relations (Pick-One & Related Lists)
 
-**Mapping:** CAP-401 (belongs-to inputs, has-many Lists), CAP-402 (unknown targets cannot ship), CAP-403 (related Lists behave identically to top-level Lists).
+**Mapping:** CAP-401 (belongs-to inputs, has-many Lists), CAP-402 (unknown targets cannot ship), CAP-403 (related Lists behave identically to top-level Lists), CAP-404 (many-to-many over detected Junctions — compiles to a Junction-filtered query on the target Replica; multi-select pick-one where declared; non-pure junctions fall back to ordinary has-many editing).
 
 The unification: a related List **is** a query entry in the *target* Resource's Replica whose filter is the relation Field. Every List behavior (windowing, invalidation, Pending Changes) applies with no second mechanism.
 
@@ -36,4 +36,6 @@ sequenceDiagram
     Note over R2B: reparenting is automatic: a B whose relation<br/>Field changes touches a filter Field of this query →<br/>field-aware invalidation refetches membership
 
     Note over R6: belongs-to input (CAP-401): pick-one control<br/>searches B through the same Replica/query path
+
+    Note over R6,R2B: many-to-many (CAP-404): declared over the Junction J;<br/>renders as an embedded List of B filtered {junction FK = this A}<br/>— same query-entry machinery; pick-one gains multi-select,<br/>each selection staging a Pending Change on a J row through<br/>the standard mutation lifecycle
 ```
