@@ -1,5 +1,19 @@
 # Stage 4 Changelog — `.constitution/tasks/`
 
+## v0.3.0 — 2026-08-21
+
+Realign Evolution pass over tech-spec v0.2.0 (rulings: `../reports/2026-08-21-interview-realign.md`).
+
+### Added
+- **GA-B000** (Chore, 3 pts): substrate re-pin to frozen git revs per ADR-011 — dual-location manifests, HttpClient source verdict, seam re-exercise, registry-resolution CI lane. Heads Epic B.
+
+### Changed
+- **GA-B003** (2→3 pts): scope now includes bulk contract forms with loop-fallback semantics and the typed PermissionHints vocabulary; gherkin extended accordingly.
+- **GA-B005**: conformance obligations extended to bulk semantics, partial-failure reporting, and permission-vocabulary shape.
+- **GA-E001** (3→5 pts): format-2 emitter — scalar kind taxonomy, temporal kinds, self_ref flags, Junction candidates, binding-namespace banner.
+- **GA-F001** (5→8 pts): full builder surface per the amended contract (binding key, undo_window, many_to_many, cross-binding UNVERIFIED markers, FormBuilder layout primitives, FieldRule set, quick_edit restriction).
+- **Recomputed `critical-path.md`:** active story points **112 → 121**, tickets 31 → 32; spine and build order gain GA-B000; deferred Epics G–K re-outlined to absorb realign scope (shell chrome/palette/theming, input catalog/drafts/confirmations/quick-edit, m2m + cross-binding relations, ObjectStore S3 implementation + MinIO, multi-backend demos, NFC-05 measurement).
+
 ## v0.1.2 — 2026-07-10
 
 Epic A (Foundation & OSS Bootstrap) completed and archived.
