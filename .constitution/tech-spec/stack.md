@@ -15,7 +15,7 @@ All versions below verified against crates.io / upstream source on 2026-07-09; s
 
 ## Substrate (git-frozen family — ADR-011, supersedes ADR-004)
 
-Every family member is tracked **via git at a lockfile-frozen rev** with a dual-location manifest (`version` fallback + `git` source; local builds resolve from git, publishes from the registry when releases satisfy the declared versions). The family moves only via a deliberate bump PR that refreezes all revs together and re-exercised the two integration seams.
+Every family member is tracked **via git at a lockfile-frozen rev** with a dual-location manifest (`version` fallback + `git` source; local builds resolve from git, publishes from the registry when releases satisfy the declared versions). The family moves only via a deliberate bump PR that refreezes all revs together and re-exercises the two integration seams.
 
 | Crate | Source | Fallback version | Role (maps to architecture) |
 | :--- | :--- | :--- | :--- |
