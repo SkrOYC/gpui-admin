@@ -12,6 +12,8 @@ R1's contract could return the substrate's `Task` type (coupling every Provider 
 - Providers receive an injected **`Arc<dyn HttpClient>`**; the Replica boundary wraps returned futures into substrate `Task`s via `cx.spawn`.
 - We ship a thin **reqwest-backed `HttpClient` adapter** (`reqwest 0.13`) running on a dedicated tokio-runtime thread — the upstream pattern — inside `gpui-admin-core::provider`.
 
+> **Annotation (2026-08-21 realign, ADR-011):** with the substrate family tracked at frozen git revs, the correct source for the injected `HttpClient` trait (registry mirror `gpui_http_client` vs zed-main's `http_client`/`reqwest_client`) is re-verified during the substrate re-pin ticket; any source migration amends this ADR and the conformance suite together (RSK-07).
+
 ## Consequences
 
 - Providers are UI-framework-free: testable as plain async with `FakeHttpClient`, implementable by Contributors who never touch the substrate (CAP-1003).

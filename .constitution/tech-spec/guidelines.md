@@ -46,7 +46,7 @@ gpui-admin/
 └── .github/workflows/              # ci.yml (fmt, clippy, test, conformance), release-plz.yml
 ```
 
-**Dependency direction (enforced by crate graph):** `cli` and `conformance` never depend on `ui`; `core` depends on `gpui` but never on `gpui-component`; `provider-supabase` (and the `conformance` harness) depend on `core`'s public contracts plus `gpui_http_client` solely to name the injected `HttpClient` trait they must implement/exercise (ADR-003, `contracts/provider.rs`) — no other substrate privilege, keeping the first-party Provider unprivileged (CAP-603/604); `macros` is a dependency of the Adopter's app crate, not of `core`.
+**Dependency direction (enforced by crate graph):** `cli` and `conformance` never depend on `ui`; `core` depends on the gpui substrate but never on `gpui-component`; `provider-supabase` (and the `conformance` harness) depend on `core`'s public contracts plus the injected-`HttpClient` trait source solely to name/implement it (ADR-003; source verdict per ADR-011's re-pin ticket) — no other substrate privilege, keeping first-party Providers unprivileged (CAP-603/604); `macros` is a dependency of the Adopter's app crate, not of `core`. The substrate family is git-tracked at frozen revs (ADR-011); CI fails any manifest introducing an unfrozen or out-of-family git reference. Hermeticity discipline (NFC-11) is upheld via committed lockfile + `cargo vendor`, not via registry-only sourcing.
 
 ## Developer Environment
 
@@ -58,7 +58,7 @@ A reproducible [devenv](https://devenv.sh) (Nix) shell provides the pinned Rust 
 - **Linting:** workspace-level `[workspace.lints]`: clippy `all` + `pedantic` (curated allows), `-D warnings` in CI. Library crates additionally deny `clippy::unwrap_used`, `clippy::expect_used` (structured errors only); binaries/tests exempt.
 - **Unsafe:** `#![forbid(unsafe_code)]` in every crate. No exceptions at v0.x.
 - **Public API docs:** `#![deny(missing_docs)]` in `gpui-admin`, `gpui-admin-core`, `gpui-admin-conformance` — the surfaces Adopters and Contributors read.
-- **Errors:** the taxonomy in `contracts/provider.rs` is the only error currency crossing crate boundaries; `anyhow` confined to binaries.
+- **Errors:** the taxonomy in `contracts/provider.rs` (+ `contracts/object_store.rs` for R10) is the only error currency crossing crate boundaries; `anyhow` confined to binaries.
 - **Naming discipline:** code identifiers follow `.constitution/prd/glossary.md` (Vocabulary Drift Rule): `Provider`, `Replica`, `PendingChange`, `Snapshot`, `Scaffold`, `Workspace`, `Panel` — never the prohibited synonyms.
 
 ### Testing expectations

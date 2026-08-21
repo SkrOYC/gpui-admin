@@ -61,7 +61,15 @@ pub struct FilterClause<R: Resource> {
     pub value: FilterValue, // typed scalar/list; serialization dialect is Provider-owned
 }
 
-pub enum FilterValue { /* Bool, I64, F64, Text, Timestamp, Uuid, List(Vec<FilterValue>), ... */ }
+pub enum FilterValue {
+    /* Bool, I32, I64, F64, Decimal(exact — never routed through F64),
+       Text, Date, Time, TimestampNaive, TimestampAware(instant), Uuid,
+       List(Vec<FilterValue>), ... */
+}
+// Exact-decimal scalars exist because money corrupted through binary floats is
+// a correctness failure (CAP-312); temporal kinds are distinct so rendering can
+// be type-faithful (CAP-211): naive values render verbatim, aware instants
+// convert only at display.
 
 pub struct Query<R: Resource> {
     /// AND-composed typed predicates.
@@ -164,6 +172,28 @@ pub trait DataProvider: Send + Sync + 'static {
     fn delete<R: Resource>(
         &self, id: R::Id, previous: &R::Record,
     ) -> impl Future<Output = Result<(), MutationError<R>>> + Send;
+
+    // -- Bulk forms (2026-08-21 realign: contract-level bulk operations) ------
+    // Baseline semantics: Providers WITHOUT native bulk support loop the
+    // singular methods internally; per-item outcomes follow singular semantics.
+    // Partial-failure reporting shape is a conformance-suite obligation (RSK-07).
+    // ConditionalUpdate does NOT extend to bulk at v0.x: preconditions are
+    // per-record and bulk callers hold no per-id baselines — Providers MUST
+    // reject update_many/delete_many with MutationError::Conflict when a
+    // conditional precondition would be required, rather than silently
+    // overwriting (CAP-307 remains singular-only).
+
+    fn create_many<R: Resource>(
+        &self, payloads: &[R::CreatePayload],
+    ) -> impl Future<Output = Result<Vec<R::Record>, MutationError<R>>> + Send;
+
+    fn update_many<R: Resource>(
+        &self, ids: &[R::Id], patch: &UpdatePatch<R>,
+    ) -> impl Future<Output = Result<usize, MutationError<R>>> + Send;
+
+    fn delete_many<R: Resource>(
+        &self, ids: &[R::Id],
+    ) -> impl Future<Output = Result<usize, MutationError<R>>> + Send;
 }
 
 #[derive(Clone, Copy, Debug)]
@@ -216,4 +246,19 @@ pub struct NoAuth;
 pub struct Identity { pub display_name: Option<String>, /* opaque claims */ }
 pub struct Credentials { /* provider-defined; opaque to core */ }
 /// Structurally advisory: consumable only by affordance APIs, not by mutation paths.
-pub struct PermissionHints { /* opaque */ }
+/// Carries the minimal declarative vocabulary (CAP-703): per-Resource CRUD
+/// booleans plus per-Field read/write masks. Providers with richer schemes map
+/// onto this vocabulary; anything unmapped simply yields no hint (affordance
+/// defaults to enabled-and-corrected-by-backend-denial).
+pub struct PermissionHints { /* resource_key -> ResourcePermissions */ }
+pub struct ResourcePermissions {
+    pub create: bool,
+    pub read: bool,
+    pub update: bool,
+    pub delete: bool,
+    /// Per-Field read/write mask over the Resource's field enum.
+    pub fields: FieldPermissionMask,
+}
+/// Bitset keyed by the generated field enum (same machinery as FieldSet):
+/// read-allowed and write-allowed masks per Field. Advisory only.
+pub struct FieldPermissionMask { /* opaque */ }
