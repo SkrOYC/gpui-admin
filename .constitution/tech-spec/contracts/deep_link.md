@@ -19,6 +19,8 @@ Typed `Query<R>` serializes losslessly using snapshot-canonical field names (`Fi
 | `sort` | Repeatable, order-significant. `<field>:<asc\|desc>` | `sort=name:asc` |
 | `search` | Percent-encoded free text | `search=annual%20report` |
 
+Delimiter rule: the delimiters themselves (`:`, `,`, `&`, `=`) are always literal structure; any occurrence of one of them *inside* a value is RFC 3986 percent-encoded (`%3A`, `%2C`, `%26`, `%3D`). Decoding is therefore unambiguous without quoting conventions.
+
 Percent-encoding per RFC 3986 applies to values; field names are already identifier-safe. Decimal values serialize exactly (never through binary floats).
 
 ## Behavioral guarantees

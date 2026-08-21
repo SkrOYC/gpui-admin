@@ -134,6 +134,14 @@ pub enum MutationError<R: Resource> {
     Conflict,
 }
 
+/// Per-item bulk outcome (request order preserved).
+pub struct BulkResult<R: Resource, T> {
+    /// Succeeded items: (index into the request, payload/ack).
+    pub ok: Vec<(usize, T)>,
+    /// Failed items: (index into the request, error). Never overlaps `ok`.
+    pub errors: Vec<(usize, MutationError<R>)>,
+}
+
 // ---------------------------------------------------------------------------
 // The Provider contract (ADR-003: async fn in trait; used generically, never dyn)
 // ---------------------------------------------------------------------------
@@ -176,24 +184,29 @@ pub trait DataProvider: Send + Sync + 'static {
     // -- Bulk forms (2026-08-21 realign: contract-level bulk operations) ------
     // Baseline semantics: Providers WITHOUT native bulk support loop the
     // singular methods internally; per-item outcomes follow singular semantics.
-    // Partial-failure reporting shape is a conformance-suite obligation (RSK-07).
-    // ConditionalUpdate does NOT extend to bulk at v0.x: preconditions are
-    // per-record and bulk callers hold no per-id baselines — Providers MUST
-    // reject update_many/delete_many with MutationError::Conflict when a
-    // conditional precondition would be required, rather than silently
-    // overwriting (CAP-307 remains singular-only).
+    // Outcomes are PER-ITEM (`BulkResult`): wholesale Err means nothing was
+    // dispatched (e.g., fail-fast validation or an up-front capability
+    // rejection); per-item failures ride `BulkResult.errors`. Partial-failure
+    // reporting obligations are pinned by the Conformance Suite (RSK-07).
+    // ConditionalUpdate does NOT extend to bulk at v0.x: bulk callers hold no
+    // per-id baselines, so a Provider whose Backend requires per-record
+    // preconditions for update/delete MUST fail fast BEFORE touching any
+    // record with `Err(MutationError::Data(DataError::UnsupportedQuery))`
+    // naming the limitation — deterministic, distinguishable from genuine
+    // conflicts, and triggering no conflict-recovery UX (CAP-307 remains
+    // singular-only).
 
     fn create_many<R: Resource>(
         &self, payloads: &[R::CreatePayload],
-    ) -> impl Future<Output = Result<Vec<R::Record>, MutationError<R>>> + Send;
+    ) -> impl Future<Output = Result<BulkResult<R, R::Record>, MutationError<R>>> + Send;
 
     fn update_many<R: Resource>(
         &self, ids: &[R::Id], patch: &UpdatePatch<R>,
-    ) -> impl Future<Output = Result<usize, MutationError<R>>> + Send;
+    ) -> impl Future<Output = Result<BulkResult<R, ()>, MutationError<R>>> + Send;
 
     fn delete_many<R: Resource>(
         &self, ids: &[R::Id],
-    ) -> impl Future<Output = Result<usize, MutationError<R>>> + Send;
+    ) -> impl Future<Output = Result<BulkResult<R, ()>, MutationError<R>>> + Send;
 }
 
 #[derive(Clone, Copy, Debug)]

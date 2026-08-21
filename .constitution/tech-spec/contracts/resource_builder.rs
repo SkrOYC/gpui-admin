@@ -40,13 +40,14 @@ impl<R: Resource> ResourceBuilder<R> {
     pub fn belongs_to<Target: Resource>(self, via: R::Field) -> Self { unimplemented!() }
     pub fn has_many<Target: Resource>(self, target_fk: Target::Field) -> Self { unimplemented!() }
 
-    /// Many-to-many over a detected Junction resource (CAP-404). Compiles to a
-    /// Junction-filtered query on the target Replica; pick-one inputs gain
-    /// multi-select behavior. The TARGET side is derived from the junction's
-    /// declaration (its two FK sides name both endpoints); the other side is
-    /// this Resource. Junction candidates come from Snapshot detection;
-    /// non-pure junctions must use has_many instead (build-time guidance).
-    pub fn many_to_many<J: Resource>(self, via_junction: &J) -> Self { unimplemented!() }
+    /// Many-to-many over a detected Junction resource (CAP-404). Type-level on
+    /// both the Junction and the Target — no instances passed. The two FK fields
+    /// live ON THE JUNCTION: `via_self` must reference this Resource, `via_target`
+    /// must reference `Target`; registration type-checks both and rejects swaps.
+    /// Compiles to a Junction-filtered query on the target Replica; pick-one
+    /// inputs gain multi-select behavior. Junction candidates come from Snapshot
+    /// detection; non-pure junctions must use has_many instead (build guidance).
+    pub fn many_to_many<J: Resource, Target: Resource>(self, via_self: J::Field, via_target: J::Field) -> Self { unimplemented!() }
 
     /// Per-View overrides. Forms accept layout composition (sections/columns);
     /// show takes a plain ordered projection.
