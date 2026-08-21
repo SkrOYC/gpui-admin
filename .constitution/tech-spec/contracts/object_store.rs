@@ -45,9 +45,11 @@ pub enum ObjectError {
 /// prd/vision.md); Contributors may target anything.
 ///
 /// Dispatch ordering contract (with R3): upload happens BEFORE the record
-/// mutation is sent. On record rejection or Undo-Window revocation the
-/// coordinator calls `delete` best-effort; cleanup failures are logged to
-/// diagnostics (orphan report) and are NOT surfaced as mutation failures.
+/// mutation is sent. Uploads therefore begin only at dispatch (after the
+/// Undo Window elapses), so revocation never leaves an uploaded object.
+/// On record rejection or transport failure the coordinator calls `delete`
+/// best-effort; cleanup failures are logged to diagnostics (orphan report)
+/// and are NOT surfaced as mutation failures.
 pub trait ObjectStore: Send + Sync + 'static {
     /// Starts an upload immediately; the returned handle streams progress
     /// events while the transfer runs and is awaited for the final reference.
@@ -60,6 +62,9 @@ pub trait ObjectStore: Send + Sync + 'static {
 
     /// Fetch bytes for rendering (image previews). Views cache via the
     /// Replica-adjacent object cache; never block interaction on this (NFC-04).
+    /// Accepted assumption: preview fetches are size-bounded by the caller
+    /// (threshold + degradation policy lands with the Epic J implementation);
+    /// NFC-05 calibration accounts for object-cache residency explicitly.
     fn get(&self, reference: &ObjectRef)
         -> impl Future<Output = Result<Arc<[u8]>, ObjectError>> + Send;
 
@@ -70,6 +75,9 @@ pub trait ObjectStore: Send + Sync + 'static {
 }
 
 /// Eager handle: progress observable while in flight; completion awaited.
+/// Dropping the handle without awaiting `finish` cancels the upload with a
+/// best-effort abort; abort failures land in the orphan report, matching the
+/// crash-between-steps guarantee in flow-object-upload-lifecycle.md.
 pub struct UploadHandle { /* opaque */ }
 impl UploadHandle {
     pub async fn finish(self) -> Result<(ObjectRef, UploadStats), ObjectError> { unimplemented!() }
