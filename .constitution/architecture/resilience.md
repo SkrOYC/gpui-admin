@@ -4,7 +4,7 @@
 
 - **The only enforcement boundary is the Backend** (NFC-30). Every client-side gate — permission affordances, hidden actions, disabled controls — is advisory by construction. R7 exposes affordance *hints*; R1's normalized `forbidden` error is the corrective feedback loop that repairs a stale hint. No container may treat an affordance as a precondition for correctness.
 - **Secrets:** session material lives in R7 and is persisted, if at all, only via platform secure storage (NFC-32). R9 (Local State Store) never holds credentials; Deep Links never carry session state.
-- **Egress discipline:** R1 is the only container with Backend network access; B1 is the only tool with Schema Source access, and only during explicit invocation. A default build makes no other network contact (NFC-31) — structurally auditable because egress is confined to two named boundaries.
+- **Egress discipline:** R1 is the only container with Backend network access; R10 is the only container with Object Store access; B1 is the only tool with Schema Source access, and only during explicit invocation. A default build makes no other network contact (NFC-31) — structurally auditable because egress is confined to three named boundaries. Distribution, update checking, and error reporting have no framework surface at all; the structured-log subscriber seam belongs to the Adopter.
 
 ## Failure Handling
 
@@ -17,9 +17,13 @@
 
 **Mutations:**
 - **Never auto-retried.** Retry is an explicit Operator act from the preserved-input state (CAP-304, NFC-21).
+- **Destructive actions are confirmation-gated before staging** (CAP-308): the "are you sure?" gate guards intent, the Undo Window guards regret — two different moments, both required for deletes.
+- **File/image mutations upload first** via R10 (object-first ordering): a committed Record never carries a dangling reference; rejection or revocation triggers best-effort object cleanup whose failures land in R8's orphan report. This is a documented, scoped exception to subtraction-only rollback — compensating action on storage infrastructure, never on replica truth.
 - Per-Record FIFO in R3: a Record's second mutation waits for the first to settle, keeping overlays coherent.
-- Rollback is subtraction: removing the overlay restores pure Backend truth; there are no compensating writes to fail.
-- Undo Window semantics: a staged change is not yet dispatched, so revocation is non-occurrence — the strongest possible failure semantics for the most common regret path.
+- Rollback is subtraction: removing the overlay restores pure Backend truth; there are no compensating writes to records.
+- Undo Window semantics: a staged change is not yet dispatched, so revocation is non-occurrence — the strongest possible failure semantics for the most common regret path. Duration defaults framework-wide; the Adopter overrides it per Resource.
+
+**Drafts (local only):** unsaved form input persists to R9, never crosses any Gateway, and restores verbatim alongside the mid-edit drift warning so stale Drafts cannot silently masquerade as current truth (CAP-309).
 
 **Connectivity state machine (owned by R1, surfaced by R5):**
 - `healthy` → normal operation.
@@ -37,7 +41,7 @@
 - **One-way truth (run time):** Backend → Gateway → Replica → Views. The overlay is a read-time lens, never written back into record truth. Pending state and confirmed state are architecturally incapable of being confused.
 - **One-way truth (build time):** Schema Source → Snapshot → (Scaffold once) → verification. Regeneration overwrites only machine-owned artifacts; contradictions halt the build.
 - **Fault containment:** a Record that fails to conform is stored as a contained per-Record fault and rendered as a bounded error region (CAP-205, NFC-20); one bad Record can degrade exactly one row, nowhere else.
-- **Honest derived state:** query views are memoized joins, rebuilt only on relevant change (field-aware invalidation); anything the client cannot truthfully compute (server ordering, filtered membership on complex predicates, totals on sequential Backends) is deferred to the Backend rather than simulated.
+- **Honest derived state:** query views are memoized joins, rebuilt only on relevant change (field-aware invalidation); anything the client cannot truthfully compute (server ordering, filtered membership on complex predicates, totals on sequential Backends) is deferred to the Backend rather than simulated. Where richness is absent (Search), the client helps only as far as truth allows — loaded-window substring matching under an explicit label — and never beyond.
 
 ## Identity & Session
 
