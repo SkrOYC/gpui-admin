@@ -14,12 +14,14 @@ C4Context
     System(toolchain, "Framework + Toolchain", "Library, declarations, offline schema capture & scaffolding")
     System(adminApp, "Admin Application", "Compiled native desktop app produced by the Adopter")
     System_Ext(backend, "Backend", "Sovereign system of record")
+    System_Ext(objectStore, "Object Store", "binary object storage beside the Backend")
     System_Ext(schemaSource, "Schema Source", "Database catalog or API description")
 
     Rel(adopter, toolchain, "declares Resources; builds with")
     Rel(toolchain, schemaSource, "captures Schema Snapshot from (offline, one-time acts)")
     Rel(operator, adminApp, "browses & edits via Workspace")
-    Rel(adminApp, backend, "reads/writes through a Provider")
+    Rel(adminApp, backend, "reads/writes through a Provider per Provider Binding")
+    Rel(adminApp, objectStore, "stores/retrieves binary objects when configured")
     Rel(backendOwner, backend, "owns; enforces authorization")
 ```
 
@@ -54,6 +56,7 @@ classDiagram
         counting
     }
     class Backend
+    class ObjectStore
     class Workspace
     class Panel
     class Operator
@@ -65,6 +68,8 @@ classDiagram
     Resource "1" *-- "many" View
     Resource --> Relation : declares
     Relation --> Resource : targets (verified)
+    Relation --> Junction : many-to-many via (detected)
+    Resource --> ProviderBinding : bound to (build-time, defaultable)
     Resource "1" o-- "many" Record
     View --> Projection : displays through
     View --> Filter : constrained by (List)
@@ -81,5 +86,7 @@ classDiagram
 
 - **Truth flows one way at build time:** Schema Source → Schema Snapshot → Scaffold → Resource declarations. Regeneration overwrites Snapshots, never Scaffolds; contradictions between the two halt the build (Drift).
 - **Truth flows one way at run time:** the Backend is the only authority on stored data, ordering, membership, and authorization. Pending Changes are honest, revocable local previews — never a second source of truth.
+- **Many sovereigns, one admin:** each Resource carries its own Provider Binding; cross-Binding Relations are possible but structurally verified only, visibly marked, and never Snapshot-backed.
+- **Objects are infrastructure:** binary objects live in the configured Object Store under its own contract; Records hold references. Committed Records never carry dangling references; upload/cleanup ordering makes failures observable, not invisible.
 - **The Workspace is personal:** layout state belongs to the Operator's machine. Shared addressing (Deep Link) identifies content, never someone's arrangement.
 - **Cooperation is declarative:** everything a Backend *may* offer beyond elementary reads/writes enters the model only as a declared Capability on its Provider.
