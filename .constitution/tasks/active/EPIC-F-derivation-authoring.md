@@ -5,7 +5,7 @@ Closes the build-time spine (B3/B4 containers): the typed builder surface (ADR-0
 #### GA-F001 Typed builder authoring surface
 
 - **Type:** Feature
-- **Effort:** 5
+- **Effort:** 8
 - **Dependencies:** GA-D003
 - **Category:** Feature-Evolution
 - **Scope (In-Scope Files):**
@@ -16,16 +16,20 @@ Closes the build-time spine (B3/B4 containers): the typed builder surface (ADR-0
 - **Expected Success Output:** `exit 0`
 - **STOP Conditions:**
   - "STOP if any builder method would accept a stringly field reference; typed field identity is the surface's reason to exist (ADR-002)."
-- **Description:** Implement the normative builder API: `resource::<R>()`, per-field config closures, relation declarations (`belongs_to`/`has_many` with typed targets), per-view projections, `build() → ResourceDecl`. Declarations are plain values: constructible in tests, iterable, registrable. The tracer resource's hand config is ported to it as the first consumer.
+- **Description:** Implement the normative builder API in full: `resource::<R>()`, Provider Binding key (default-binding fallback), `undo_window(Duration)` override, per-field config closures with the closed declarative `FieldRule` set plus closure escape hatch and `quick_edit()` restriction, relation declarations (`belongs_to`/`has_many` with typed targets; cross-binding accepted and marked UNVERIFIED; `many_to_many` over junction declarations), per-view projections with FormBuilder layout primitives (sections/columns), `build() → ResourceDecl`. Declarations are plain values: constructible in tests, iterable, registrable. The tracer resource's hand config is ported to it as the first consumer.
 - **Acceptance Criteria (Gherkin):**
 ```gherkin
 Given the tracer resource declared through the builder
 When the declaration value is inspected in a unit test
-Then field config, projections and relations match the hand-written original
+Then field config, rules, layout sections, projections and relations match the hand-written original
 
-Given a declaration with a duplicate projection entry
+Given a declaration whose relation targets another Provider's Resource
 When registration runs
-Then the startup assertion rejects it with a message naming the field
+Then it is accepted, structurally verified only, and carries the UNVERIFIED marker
+
+Given a declaration with a duplicate projection entry or a quick_edit on a rich widget
+When registration runs
+Then the startup assertion rejects it with a message naming the offense
 ```
 
 #### GA-F002 Derivation macros over committed Snapshots

@@ -5,7 +5,7 @@ The offline build-time pipeline's capture half (B1/B2 containers): CLI skeleton,
 #### GA-E001 Snapshot emitter
 
 - **Type:** Feature
-- **Effort:** 3
+- **Effort:** 5
 - **Dependencies:** GA-A001
 - **Category:** Feature-Evolution
 - **Scope (In-Scope Files):**
@@ -16,7 +16,7 @@ The offline build-time pipeline's capture half (B1/B2 containers): CLI skeleton,
 - **Expected Success Output:** `exit 0` (golden outputs match)
 - **STOP Conditions:**
   - "STOP if emission needs source-dialect concepts in the neutral model; the model's neutrality is the CAP-102 guarantee."
-- **Description:** The single emitter both frontends feed: neutral model (types, nullability, server-owned, unique, enums, relations) → generation banner + format marker + Record structs + field enums + metadata tables, formatted for human review. Golden-tested from hand-built model fixtures.
+- **Description:** The single emitter both frontends feed: neutral model (types incl. the format-2 scalar taxonomy — Decimal exact, temporal kinds naive/aware —, nullability, server-owned, unique, enums, relations with self_ref flags, Junction candidates) → generation banner (incl. binding namespace) + format marker + Record structs + field enums + metadata tables, formatted for human review. Golden-tested from hand-built model fixtures.
 - **Acceptance Criteria (Gherkin):**
 ```gherkin
 Given a neutral model fixture with nullable, server-owned and relation fields
