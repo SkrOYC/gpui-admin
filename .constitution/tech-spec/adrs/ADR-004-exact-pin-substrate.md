@@ -1,6 +1,6 @@
 # ADR-004: Exact-Pin Policy for the Substrate Family
 
-**Status:** Accepted.
+**Status:** Superseded by [ADR-011](./ADR-011-substrate-rev-pinning.md) (2026-08-21 realign). Retained for decision provenance; the correction note below remains historically accurate.
 
 ## Context
 

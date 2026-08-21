@@ -1,5 +1,23 @@
 # Stage 3 Changelog — `.constitution/tech-spec/`
 
+## v0.2.0 — 2026-08-21
+
+Realign Evolution pass over prd v0.2.0 / architecture v0.2.0 (rulings: `../reports/2026-08-21-interview-realign.md`).
+
+### Added
+- **ADR-011** superseding ADR-004: substrate family tracked via git at lockfile-frozen revs, dual-location manifests, deliberate refreeze PRs, publish gate + registry-resolution CI lane; NFC-11 hermeticity preserved via committed lockfile + `cargo vendor`.
+- **Contract `object_store.rs`:** ObjectStore port (put/get/delete), ObjectRef/ObjectError, object-first dispatch ordering with best-effort cleanup semantics (PB-2).
+- **Contract `deep_link.md`:** adopter-declared scheme grammar; readable path+query serialization of typed Queries via snapshot-canonical field names; Decimal values serialized exactly.
+- **Builder surface:** `provider()` binding key, `undo_window()`, `many_to_many()`, cross-provider relation acceptance with UNVERIFIED markers, `FormBuilder` section/columns layout primitives, closed declarative `FieldRule` set alongside closures, `quick_edit()` for simple widgets, expanded Widget catalog (DecimalNumber, DateTime, Time, Password, Email, Url, RichText, Markdown, File/ImageUpload).
+- **Snapshot format 2:** `FieldKind` scalar taxonomy (Decimal exact; TimestampNaive/TimestampAware distinction), `self_ref` relation flags, Junction candidates, per-binding namespace banner.
+- **BOM:** MinIO in showcase compose (ADR-008 amendment); ICU4X formatting family, `keyring`, and `rust_decimal` added as *(pin at planning)* entries; bulk methods + typed PermissionHints vocabulary in `provider.rs`.
+
+### Changed
+- **Compatibility Policy §3 acknowledgments:** the bulk methods are additive pre-release (no external consumers yet; loop-fallback documented in-contract); the `create()`/`edit()` builder signatures changed from bare projections to FormBuilder closures — both land before any registry publish, so no migration path is owed beyond release notes; each carries a paired conformance-suite obligation (RSK-07) to be implemented with Epic B.
+- ADR-003 annotated: HttpClient source verdict deferred to the substrate re-pin ticket.
+- Compatibility Policy §1 rewritten around rev-freezing; dependency-direction rule updated (git-family policy; NFC-11 note); error-currency rule extended to the object-store taxonomy.
+- workspace-layout invariants updated: column masks, Saved Query bookmarks, Drafts are stored payload classes (operator input, not wholesale Record caches).
+
 ## v0.1.1 — 2026-07-10
 
 Epic A execution updates (single tech-spec bump for the whole Epic A PR).
